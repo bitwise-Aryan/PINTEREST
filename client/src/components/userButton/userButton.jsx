@@ -11,21 +11,21 @@ const UserButton = () => {
   const navigate = useNavigate();
 
   // TEMP
-//   const currentUser = true;
+  // const currentUser = true;
 
   const { currentUser, removeCurrentUser } = useAuthStore();
 
   console.log(currentUser);
 
-//   const handleLogout = async () => {
-//     try {
-//       await apiRequest.post("/users/auth/logout", {});
-//       removeCurrentUser();
-//       navigate("/auth");
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   };
+  const handleLogout = async () => {
+    try {
+      await apiRequest.post("/users/auth/logout", {});
+      removeCurrentUser();
+      navigate("/auth");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return currentUser ? (
     <div className="userButton">

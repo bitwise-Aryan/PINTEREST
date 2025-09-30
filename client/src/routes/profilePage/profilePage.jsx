@@ -5,7 +5,7 @@ import Gallery from "../../components/gallery/gallery";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import apiRequest from "../../utils/apiRequest";
-// import Boards from "../../components/boards/boards";
+import Boards from "../../components/boards/boards";
 import FollowButton from "./FollowButton";
 
 const ProfilePage = () => {

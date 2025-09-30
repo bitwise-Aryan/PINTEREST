@@ -1,12 +1,12 @@
-// import Image from "../image/image";
-// import {Link} from "react-router";
+import Image from "../image/image";
+import {Link} from "react-router";
 import "./leftBar.css";
 
 const LeftBar = () => {
   return (
     <div className="leftBar">
-      {/* <div className="menuIcons"> */}
-        {/* <Link to="/" className="menuIcon">
+      <div className="menuIcons">
+        <Link to="/" className="menuIcon">
           <Image path="/general/logo.png" alt="" className="logo"/>
         </Link>
         <Link to="/" className="menuIcon">
@@ -24,13 +24,9 @@ const LeftBar = () => {
       </div>
       <Link to="/" className="menuIcon">
         <Image path="/general/settings.svg" alt="" />
-      </Link> */}
+      </Link>
     </div>
   );
 };
 
 export default LeftBar;
-
-
-
-
