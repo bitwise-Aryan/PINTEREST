@@ -9,24 +9,17 @@ import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import dotenv from "dotenv";
 
-dotenv.config(); // 
+dotenv.config(); // Load environment variables
 
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
-<<<<<<< HEAD
-// app.use(cookieParser());
-// app.use(fileUpload());
-=======
+// These were the conflicting lines, now resolved to be active middleware
 app.use(cookieParser());
 app.use(fileUpload());
-<<<<<<< HEAD
-=======
->>>>>>> 71ea0e4c247ab06b149cb237861bb1035834d96a
 
->>>>>>> a02dcd58eaba7139fca1c906b8cb296bb0bb6d08
 // Routes
 app.use("/users", userRouter);
 app.use("/pins", pinRouter);
