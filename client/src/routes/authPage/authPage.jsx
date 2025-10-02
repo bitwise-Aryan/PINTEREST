@@ -35,7 +35,7 @@ const AuthPage = () => {
   return (
     <div className="authPage">
       <div className="authContainer">
-        <Image path="/general/logo.png" w={36} h={36} alt="" />
+        <Image path="/general/temp3.png" w={95} h={95} alt="" />
         <h1>{isRegister ? "Create an Account" : "Login to your account"}</h1>
         {isRegister ? (
           <form key="register" onSubmit={handleSubmit}>

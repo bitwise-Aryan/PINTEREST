@@ -9,7 +9,7 @@
   position: sticky;
   top: 0;
   padding: 16px 0px;
-  border-right: 1px solid #e9e9e9;
+  border-right: 1px solid #440303e7;
 }
 
 .menuIcons {
@@ -20,18 +20,18 @@
 }
 
 .menuIcon {
-  width: 48px;
-  height: 48px;
+  width: 58px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .menuIcon:hover {
-  background-color: #f1f1f1;
+  background-color: #B88955;
 }
 
 .logo{
-  width: 47px;
-  height: 44px;
+  width: 93px;
+  height: 99px;
 }
