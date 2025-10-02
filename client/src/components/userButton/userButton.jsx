@@ -4,19 +4,13 @@ import Image from "../image/image";
 import apiRequest from "../../utils/apiRequest";
 import { Link, useNavigate } from "react-router";
 import useAuthStore from "../../utils/authStore";
-
 const UserButton = () => {
   const [open, setOpen] = useState(false);
-
   const navigate = useNavigate();
-
   // TEMP
   // const currentUser = true;
-
   const { currentUser, removeCurrentUser } = useAuthStore();
-
   console.log(currentUser);
-
   const handleLogout = async () => {
     try {
       await apiRequest.post("/users/auth/logout", {});
@@ -26,7 +20,6 @@ const UserButton = () => {
       console.log(err);
     }
   };
-
   return currentUser ? (
     <div className="userButton">
       <Image path={currentUser.img || "/general/noAvatar.png"} alt="" />
