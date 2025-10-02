@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from "zustand";// it is used for state management 
+import { persist } from "zustand/middleware";// used to make login peristance even after refresh 
 
 const useAuthStore = create(
   persist((set) => ({
