@@ -51,6 +51,7 @@ export const getPin = async (req, res) => {
   res.status(200).json(pin);
 };
 
+
 export const createPin = async (req, res) => {
   const {
     title,
