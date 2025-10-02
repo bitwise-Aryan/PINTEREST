@@ -16,13 +16,11 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
-<<<<<<< HEAD
-// app.use(cookieParser());
-// app.use(fileUpload());
-=======
+
+
 app.use(cookieParser());
 app.use(fileUpload());
->>>>>>> 71ea0e4c247ab06b149cb237861bb1035834d96a
+
 
 // Routes
 app.use("/users", userRouter);
