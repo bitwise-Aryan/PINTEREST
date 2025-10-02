@@ -1,7 +1,3 @@
-
-
-
-
 import GalleryItem from "../galleryitem/Galleryitems";
 import "./gallery.css";
 import { useInfiniteQuery } from "@tanstack/react-query";
