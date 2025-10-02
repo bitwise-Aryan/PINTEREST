@@ -10,20 +10,14 @@ import FollowButton from "./FollowButton";
 
 const ProfilePage = () => {
   const [type, setType] = useState("saved");
-
   const { username } = useParams();
-
   const { isPending, error, data } = useQuery({
     queryKey: ["profile", username],
     queryFn: () => apiRequest.get(`/users/${username}`).then((res) => res.data),
   });
-
   if (isPending) return "Loading...";
-
   if (error) return "An error has occurred: " + error.message;
-
   if (!data) return "User not found!";
-
   return (
     <div className="profilePage">
       <Image

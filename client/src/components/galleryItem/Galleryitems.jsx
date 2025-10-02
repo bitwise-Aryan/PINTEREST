@@ -33,9 +33,6 @@
 // };
 
 // export default GalleryItem;
-
-
-
 import "./galleryItem.css";
 
 import { Link } from "react-router-dom"; 
@@ -50,8 +47,11 @@ const optimizedHeight = (372 * item.height) / item.width
       className="galleryItem"
       style={{ gridRowEnd: `span ${Math.ceil(item.height / 100)}` }}
     >
-      {/* Using the custom Image component which uses IKImage internally */}
-      <Image path={item.media} alt="" w={372} h={optimizedHeight}/>
+      {/* ✅ FIX: Changed 'path' to 'src'. 
+        If item.media is a full URL (like https://picsum.photo...), 
+        you must use the 'src' prop in the ImageKit component (or its wrapper). 
+      */}
+      <Image src={item.media} alt={item.title || "Pin Image"} w={372} h={optimizedHeight}/>
     
       <Link to={`/pin/${item._id}`} className="overlay" />
       <button className="saveButton">Save</button>
@@ -66,5 +66,6 @@ const optimizedHeight = (372 * item.height) / item.width
     </div>
   );
 };
-
+  
 export default GalleryItem;
+
