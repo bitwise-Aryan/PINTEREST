@@ -16,4 +16,33 @@ export const addComment = async (req, res) => {
 };
 
 
+// @desc    Delete a comment
+// @route   DELETE /api/comments/:commentId
+// @access  Private (only the comment owner)
+export const deleteComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const userId = req.userId; // from verifyToken
 
+    const comment = await Comment.findById(commentId);
+
+    // Check if the comment exists
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found." });
+    }
+
+    // Check if the user trying to delete is the user who created the comment
+    if (comment.user.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this comment." });
+    }
+
+    // If checks pass, delete the comment
+    await Comment.findByIdAndDelete(commentId);
+
+    res.status(200).json({ message: "Comment deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete comment", error: error.message });
+  }
+};

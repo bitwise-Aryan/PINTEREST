@@ -17,7 +17,7 @@ const Comments = ({ id }) => {
         <span className="commentCount">{data.length === 0 ? "No comments" : data.length + " Comments"}</span>
         {/* COMMENT */}
         {data.map((comment) => (
-          <Comment key={comment._id} comment={comment} />
+          <Comment key={comment._id} comment={comment} postId={id} />
         ))}
       </div>
       <CommentForm id={id}/>
