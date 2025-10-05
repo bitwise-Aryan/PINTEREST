@@ -276,6 +276,7 @@
 
 import Pin from "../models/pin.model.js";
 import User from "../models/user.model.js";
+import Comment from "../models/comment.model.js";
 import Like from "../models/like.model.js";
 import Save from "../models/save.model.js";
 import Board from "../models/board.model.js";
@@ -540,4 +541,56 @@ export const interact = async (req, res) => {
     }
 
     return res.status(200).json({ message: "Successful" });
+};
+
+
+// --- NEW FUNCTION ---
+// @desc    Delete a pin
+// @route   DELETE /api/pins/:id
+// @access  Private (only the pin owner)
+export const deletePin = async (req, res) => {
+  try {
+    const pinId = req.params.id;
+    const userId = req.userId; // from verifyToken middleware
+
+    // Find the pin to be deleted
+    const pin = await Pin.findById(pinId);
+
+    // 1. Check if the pin exists
+    if (!pin) {
+      return res.status(404).json({ message: "Pin not found." });
+    }
+
+    // 2. Check if the logged-in user is the owner of the pin
+    if (pin.user.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this pin." });
+    }
+
+    // 3. Delete the file from ImageKit.io
+    if (pin.imagekitFileId) {
+        const imagekit = new Imagekit({
+            publicKey: process.env.IK_PUBLIC_KEY,
+            privateKey: process.env.IK_PRIVATE_KEY,
+            urlEndpoint: process.env.IK_URL_ENDPOINT,
+        });
+
+        await imagekit.deleteFile(pin.imagekitFileId);
+    }
+
+    // 4. Clean up associated data (cascading delete)
+    await Comment.deleteMany({ pin: pinId });
+    await Like.deleteMany({ pin: pinId });
+    await Save.deleteMany({ pin: pinId });
+    
+    // 5. Delete the pin itself
+    await Pin.findByIdAndDelete(pinId);
+
+    res.status(200).json({ message: "Pin deleted successfully." });
+
+  } catch (error) {
+    console.error("Error deleting pin:", error);
+    res.status(500).json({ message: "Failed to delete pin.", error: error.message });
+  }
 };

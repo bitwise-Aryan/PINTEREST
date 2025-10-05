@@ -20,7 +20,7 @@ const Comment = ({ comment, postId }) => {
     mutationFn: deleteComment,
     onSuccess: () => {
       // Invalidate and refetch the comments for this specific post
-      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });//Automatic Refetching: When you add or delete a comment, you can tell React Query, "Hey, the data for ["comments", id] is now out of date!" This is called "invalidating the query." React Query will then automatically run the fetch function again to get the new list of comments, and your UI updates automatically.
       toast.success("Comment deleted!");
     },
     onError: (err) => {

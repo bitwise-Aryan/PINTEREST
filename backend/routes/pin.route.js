@@ -5,6 +5,7 @@ import {
   createPin,
   interactionCheck,
   interact,
+  deletePin
 } from "../controllers/pin.controller.js";
 import { verifyToken } from "../middlewares/verifyToken.js";
 
@@ -15,5 +16,5 @@ router.get("/:id", getPin);
 router.post("/", verifyToken, createPin);
 router.get("/interaction-check/:id", interactionCheck);
 router.post("/interact/:id",verifyToken, interact);
-
+router.delete("/:id", verifyToken, deletePin);
 export default router;
