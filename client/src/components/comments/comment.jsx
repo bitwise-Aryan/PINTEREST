@@ -30,10 +30,10 @@ const Comment = ({ comment, postId }) => {
 
   const handleDelete = () => {
     // You can add a confirmation dialog here if you want, for example:
-    // if (window.confirm("Are you sure you want to delete this comment?")) {
-    //   mutation.mutate(comment._id);
-    // }
-    mutation.mutate(comment._id);
+    if (window.confirm("Are you sure you want to delete this comment?")) {
+      mutation.mutate(comment._id);
+    }
+    // mutation.mutate(comment._id);
   };
 
   return (
