@@ -44,6 +44,9 @@ const pinSchema = new Schema(
     tags: {
       type: [String],
     },
+    aiTags: {
+      type: [String],
+    },
     // Creator of the pin (required)
     user: {
       type: Schema.Types.ObjectId,

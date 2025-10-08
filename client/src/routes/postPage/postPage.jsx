@@ -95,6 +95,19 @@ const PostPage = () => {
             <Image path={data.user.img || "/general/noAvatar.png"} />
             <span>{data.user.displayName}</span>
           </Link>
+
+          {data.aiTags && data.aiTags.length > 0 && (
+            <div className="ai-tags-container">
+              <p className="tags-title">AI Generated Tags:</p>
+              <div className="tags-list">
+                {data.aiTags.map((tag, index) => (
+                  <Link to={`/?search=${tag}`} key={index} className="ai-tag">
+                    {tag}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
           <Comments id={data._id} />
         </div>
       </div>

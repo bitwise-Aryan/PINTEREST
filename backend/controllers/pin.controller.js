@@ -282,6 +282,7 @@ import Board from "../models/board.model.js";
 import sharp from "sharp";
 import Imagekit from "imagekit";
 import jwt from "jsonwebtoken";
+import { ClarifaiStub, grpc } from "clarifai-nodejs-grpc";
 
 
 
@@ -300,6 +301,7 @@ export const getPins = async (req, res) => {
             $or: [
                 { title: { $regex: search, $options: "i" } },
                 { tags: { $in: [search] } },
+                { aiTags: { $in: [search] } }, // <-- ADD THIS LINE
             ],
         };
     } else if (userId) {
@@ -353,29 +355,24 @@ export const createPin = async (req, res) => {
         newBoard,
     } = req.body;
 
-    // Assuming req.files.media is available via a middleware like express-fileupload
     const media = req.files.media;
 
     if (!req.user || !req.user._id) {
         return res.status(401).json({ message: "Authentication required to create a Pin." });
     }
-    // FIX: Standardize on using req.user._id from the isAuthenticated middleware
     const authenticatedUserId = req.user._id;
 
-    if ((!title, !description, !media)) {
+    if (!title || !description || !media) {
         return res.status(400).json({ message: "All fields are required!" });
     }
 
     const parsedTextOptions = JSON.parse(textOptions || "{}");
     const parsedCanvasOptions = JSON.parse(canvasOptions || "{}");
 
-    // ... (Image manipulation logic remains the same) ...
+    // Your existing image manipulation logic
     const metadata = await sharp(media.data).metadata();
-
-    const originalOrientation =
-        metadata.width < metadata.height ? "portrait" : "landscape";
+    const originalOrientation = metadata.width < metadata.height ? "portrait" : "landscape";
     const originalAspectRatio = metadata.width / metadata.height;
-
     let clientAspectRatio;
     let width;
     let height;
@@ -406,7 +403,6 @@ export const createPin = async (req, res) => {
     );
 
     let croppingStrategy = "";
-
     if (parsedCanvasOptions.size !== "original") {
         if (originalAspectRatio > clientAspectRatio) {
             croppingStrategy = ",cm-pad_resize";
@@ -432,45 +428,90 @@ export const createPin = async (req, res) => {
             : ""
     }`;
 
-    imagekit
-        .upload({
-            file: media.data,
-            fileName: media.name,
-            folder: "test",
-            transformation: {
-                pre: transformationString,
-            },
-        })
-        .then(async (response) => {
-            let newBoardId;
+    // Your existing ImageKit upload logic
+    imagekit.upload({
+        file: media.data,
+        fileName: media.name,
+        folder: "test",
+        transformation: {
+            pre: transformationString,
+        },
+    })
+    .then(async (response) => {
+        
+        // --- START: NEW CLARIFAI AI TAGGING LOGIC ---
 
-            if (newBoard) {
-                const res = await Board.create({
-                    title: newBoard,
-                    user: authenticatedUserId, // FIX: Use req.user._id
-                });
-                newBoardId = res._id;
+        console.log("CLARIFAI_USER_ID:", process.env.CLARIFAI_USER_ID);
+console.log("CLARIFAI_APP_ID:", process.env.CLARIFAI_APP_ID);
+console.log("CLARIFAI_API_KEY (first 8 chars):", process.env.CLARIFAI_API_KEY && process.env.CLARIFAI_API_KEY.slice(0,8));
+        let generatedAiTags = [];
+        try {
+            const stub = ClarifaiStub.grpc();
+            const metadata = new grpc.Metadata();
+            metadata.set("authorization", "Key " + process.env.CLARIFAI_API_KEY);
+
+           const clarifaiResponse = await new Promise((resolve, reject) => {
+                // --- START: FINAL CORRECTED LOGIC ---
+                stub.PostWorkflowResults(
+                    {
+                        // The user_app_id object has been REMOVED.
+                        // Your API key in the metadata handles authentication.
+                        workflow_id: "General",
+                        inputs: [{ data: { image: { url: response.url } } }],
+                    },
+                    metadata,
+                    (err, res) => {
+                        if (err) reject(err);
+                        resolve(res);
+                    }
+                );
+            });
+
+            if (clarifaiResponse.status.code !== 10000) {
+                throw new Error("Clarifai API Error: " + clarifaiResponse.status.description);
             }
 
-            const newPin = await Pin.create({
-                user: authenticatedUserId, // FIX: Use req.user._id
-                title,
-                description,
-                link: link || null,
-                board: newBoardId || board || null,
-                tags: tags ? tags.split(",").map((tag) => tag.trim()) : [],
-                media: response.filePath,
-                width: response.width,
-                height: response.height,
-            });
-            return res.status(201).json(newPin);
-        })
-        .catch((err) => {
-            console.log(err);
-            return res.status(500).json({ message: "Image upload or pin creation failed.", error: err.message });
-        });
-};
+            const concepts = clarifaiResponse.results?.[0]?.outputs?.[0]?.data?.concepts ?? [];
+            if (concepts) {
+                generatedAiTags = concepts
+                .filter(concept => concept.value > 0.50)
+                .map(concept => concept.name);
+            }
+        } catch (err) {
+            console.error("AI Tagging Failed:", err);
+        }
+        // --- END: NEW CLARIFAI AI TAGGING LOGIC ---
 
+        // Your existing logic for creating a new board
+        let newBoardId;
+        if (newBoard) {
+            const res = await Board.create({
+                title: newBoard,
+                user: authenticatedUserId,
+            });
+            newBoardId = res._id;
+        }
+
+        // Your final logic to create the pin, now including the aiTags
+        const newPin = await Pin.create({
+            user: authenticatedUserId,
+            title,
+            description,
+            link: link || null,
+            board: newBoardId || board || null,
+            tags: tags ? tags.split(",").map((tag) => tag.trim()) : [],
+            media: response.filePath,
+            width: response.width,
+            height: response.height,
+            aiTags: generatedAiTags // Save the new AI tags
+        });
+        return res.status(201).json(newPin);
+    })
+    .catch((err) => {
+        console.log(err);
+        return res.status(500).json({ message: "Image upload or pin creation failed.", error: err.message });
+    });
+};
 
 export const interactionCheck = async (req, res) => {
     const { id } = req.params;

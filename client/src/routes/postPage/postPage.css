@@ -66,3 +66,55 @@
     max-height: unset;
   }
 }
+
+
+/* Add this to postPage.css */
+
+.postDetails h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-top: 24px;
+}
+
+.postDetails p {
+  font-size: 16px;
+  color: #333;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.ai-tags-container {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #efefef;
+  width: 100%;
+}
+
+.tags-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #555;
+  font-size: 14px;
+}
+
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-tag {
+  display: inline-block;
+  background-color: #efefef;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.ai-tag:hover {
+  background-color: #e0e0e0;
+}
