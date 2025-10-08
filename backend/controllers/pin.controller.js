@@ -275,6 +275,7 @@
 
 import Pin from "../models/pin.model.js";
 import User from "../models/user.model.js";
+import Comment from "../models/comment.model.js";
 import Like from "../models/like.model.js";
 import Save from "../models/save.model.js";
 import Board from "../models/board.model.js";

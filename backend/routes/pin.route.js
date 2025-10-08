@@ -22,11 +22,12 @@
 
 import express from "express";
 import {
-  getPins,
-  getPin,
-  createPin,
-  interactionCheck,
-  interact,
+  getPins,
+  getPin,
+  createPin,
+  interactionCheck,
+  interact,
+  deletePin
 } from "../controllers/pin.controller.js";
 // FIX: Replace the old verifyToken with the new isAuthenticated middleware
 import { isAuthenticated } from "../middlewares/auth.js"; 
@@ -39,8 +40,6 @@ router.get("/:id", getPin);
 // FIX: Protected route using isAuthenticated
 router.post("/", isAuthenticated, createPin); 
 router.get("/interaction-check/:id", interactionCheck);
-
-// FIX: Protected route using isAuthenticated
-router.post("/interact/:id", isAuthenticated, interact); 
-
+router.post("/interact/:id",verifyToken, interact);
+router.delete("/:id", verifyToken, deletePin);
 export default router;

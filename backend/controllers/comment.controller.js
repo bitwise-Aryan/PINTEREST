@@ -60,22 +60,40 @@ export const getPostComments = async (req, res) => {
 };
 
 export const addComment = async (req, res) => {
-  try {
-    const { description, pin } = req.body;
-    const userId = req.user?._id;
+  const { description, pin } = req.body;
+  const userId = req.userId;
+  const comment = await Comment.create({ description, pin, user: userId });
+  res.status(201).json(comment);
+};
 
-    if (!userId) {
-      return res.status(401).json({ message: "Authentication required to add a comment." });
+
+// @desc    Delete a comment
+// @route   DELETE /api/comments/:commentId
+// @access  Private (only the comment owner)
+export const deleteComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const userId = req.userId; // from verifyToken
+
+    const comment = await Comment.findById(commentId);
+
+    // Check if the comment exists
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found." });
     }
 
-    const comment = await Comment.create({ description, pin, user: userId });
+    // Check if the user trying to delete is the user who created the comment
+    if (comment.user.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this comment." });
+    }
 
-    // Optionally fetch updated comment count for frontend update
-    const commentsCount = await Comment.countDocuments({ pin });
+    // If checks pass, delete the comment
+    await Comment.findByIdAndDelete(commentId);
 
-    res.status(201).json({ comment, commentsCount });
+    res.status(200).json({ message: "Comment deleted successfully." });
   } catch (error) {
-    console.error("Error adding comment:", error);
-    res.status(500).json({ message: "Could not add comment" });
+    res.status(500).json({ message: "Failed to delete comment", error: error.message });
   }
 };

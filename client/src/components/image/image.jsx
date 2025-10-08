@@ -37,20 +37,62 @@
 // export default Image;
 
 
+// import { IKImage } from "imagekitio-react";
+
+// const Image = ({ path, alt, className, w, h }) => {
+//   // Check if the path starts with a slash or contains no protocol (http/https).
+//   // This is the relative path from the database, which IKImage uses with urlEndpoint.
+//   if (path && (path.startsWith("/") || !path.includes(":"))) {
+    
+//     // 1. DYNAMIC IMAGE (The Pin Image from ImageKit)
+//     // We use the 'path' prop of IKImage for the relative file path.
+//     // IKImage internally constructs the full URL using the urlEndpoint + path.
+//     return (
+//       <IKImage
+//         urlEndpoint={import.meta.env.VITE_URL_IK_ENDPOINT}
+//         path={path} // <<<<--- Use 'path' for the relative file path!
+//         transformation={[
+//           {
+//             height: h,
+//             width: w,
+//           },
+//         ]}
+//         alt={alt}
+//         loading="lazy"
+//         className={className}
+//         lqip={{ active: true, quality: 20 }}
+//       />
+//     );
+//   }
+  
+//   // 2. STATIC IMAGE (Local asset or a full URL like a user avatar)
+//   // This handles local assets (like /general/share.svg) or a full, already-formed URL.
+//   // It also acts as a safeguard against the invalid URL error by ensuring 'path' is not empty.
+//   if (path) {
+//     return <img src={path} alt={alt} className={className} width={w} height={h} loading="lazy" />;
+//   }
+
+//   // 3. FALLBACK/ERROR PREVENTION
+//   // Returns nothing if 'path' is null, undefined, or an empty string, preventing the error.
+//   return null;
+// };
+
+// export default Image;
+
+
 import { IKImage } from "imagekitio-react";
 
-const Image = ({ path, alt, className, w, h }) => {
+// 1. Accept `...props` to catch any other props like onClick
+const Image = ({ path, alt, className, w, h, ...props }) => {
   // Check if the path starts with a slash or contains no protocol (http/https).
   // This is the relative path from the database, which IKImage uses with urlEndpoint.
   if (path && (path.startsWith("/") || !path.includes(":"))) {
     
-    // 1. DYNAMIC IMAGE (The Pin Image from ImageKit)
-    // We use the 'path' prop of IKImage for the relative file path.
-    // IKImage internally constructs the full URL using the urlEndpoint + path.
+    // DYNAMIC IMAGE (The Pin Image from ImageKit)
     return (
       <IKImage
         urlEndpoint={import.meta.env.VITE_URL_IK_ENDPOINT}
-        path={path} // <<<<--- Use 'path' for the relative file path!
+        path={path}
         transformation={[
           {
             height: h,
@@ -61,19 +103,18 @@ const Image = ({ path, alt, className, w, h }) => {
         loading="lazy"
         className={className}
         lqip={{ active: true, quality: 20 }}
+        {...props} // 2. Spread the rest of the props (like onClick) here
       />
     );
   }
   
-  // 2. STATIC IMAGE (Local asset or a full URL like a user avatar)
-  // This handles local assets (like /general/share.svg) or a full, already-formed URL.
-  // It also acts as a safeguard against the invalid URL error by ensuring 'path' is not empty.
+  // STATIC IMAGE (Local asset or a full URL like a user avatar)
   if (path) {
-    return <img src={path} alt={alt} className={className} width={w} height={h} loading="lazy" />;
+    // 3. Spread the rest of the props here as well
+    return <img src={path} alt={alt} className={className} width={w} height={h} loading="lazy" {...props} />;
   }
 
-  // 3. FALLBACK/ERROR PREVENTION
-  // Returns nothing if 'path' is null, undefined, or an empty string, preventing the error.
+  // FALLBACK/ERROR PREVENTION
   return null;
 };
 
