@@ -40,6 +40,6 @@ router.get("/:id", getPin);
 // FIX: Protected route using isAuthenticated
 router.post("/", isAuthenticated, createPin); 
 router.get("/interaction-check/:id", interactionCheck);
-router.post("/interact/:id",verifyToken, interact);
-router.delete("/:id", verifyToken, deletePin);
+router.post("/interact/:id",isAuthenticated, interact);
+router.delete("/:id", isAuthenticated, deletePin);
 export default router;

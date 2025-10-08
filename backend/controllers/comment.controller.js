@@ -60,40 +60,55 @@ export const getPostComments = async (req, res) => {
 };
 
 export const addComment = async (req, res) => {
+  console.log('createComment: req.user =', req.user);
+  console.log('createComment: req.body =', req.body);
+
   const { description, pin } = req.body;
-  const userId = req.userId;
-  const comment = await Comment.create({ description, pin, user: userId });
+
+  // Use the authenticated user's _id from req.user
+  const userId = req.user._id;
+
+  // Create the comment
+  const comment = await Comment.create({
+    description,
+    pin,
+    user: userId, // ✅ now required field is set
+  });
+
+  // Optional: populate user fields for response
+  await comment.populate('user', 'displayName username img');
+
   res.status(201).json(comment);
 };
-
 
 // @desc    Delete a comment
 // @route   DELETE /api/comments/:commentId
 // @access  Private (only the comment owner)
+// import Comment from "../models/comment.model.js"; // Make sure this is imported
+
 export const deleteComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const userId = req.userId; // from verifyToken
+    // FIX: Get the user ID from `req.user` which is set by the new middleware
+    const userId = req.user._id.toString(); 
 
     const comment = await Comment.findById(commentId);
 
-    // Check if the comment exists
     if (!comment) {
       return res.status(404).json({ message: "Comment not found." });
     }
 
-    // Check if the user trying to delete is the user who created the comment
     if (comment.user.toString() !== userId) {
       return res
         .status(403)
         .json({ message: "You are not authorized to delete this comment." });
     }
 
-    // If checks pass, delete the comment
     await Comment.findByIdAndDelete(commentId);
 
     res.status(200).json({ message: "Comment deleted successfully." });
   } catch (error) {
+    console.error("Error in deleteComment:", error); 
     res.status(500).json({ message: "Failed to delete comment", error: error.message });
   }
 };

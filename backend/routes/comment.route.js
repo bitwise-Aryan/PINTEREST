@@ -37,13 +37,13 @@ import {
   addComment,
   deleteComment
 } from "../controllers/comment.controller.js";
-import { verifyToken } from "../middlewares/verifyToken.js";
+import { isAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
 
 router.get("/:postId", getPostComments);
-router.post("/", verifyToken, addComment);
+router.post("/", isAuthenticated, addComment);
 // DELETE a comment by its ID (requires authentication)
-router.delete("/:commentId", verifyToken, deleteComment);
+router.delete("/:commentId", isAuthenticated, deleteComment);
 
 export default router;

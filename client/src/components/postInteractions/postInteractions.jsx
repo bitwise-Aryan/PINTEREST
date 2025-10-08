@@ -177,8 +177,6 @@ const PostInteractions = ({ postId, pinOwner }) => {
                        ___delete pin
                 </button>
               )}
-              {/* You can add other menu items here in the future */}
-              {!isOwner && <span>Report Pin</span>}
             </div>
           )}
         </div>
