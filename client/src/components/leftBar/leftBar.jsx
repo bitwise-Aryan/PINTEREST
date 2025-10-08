@@ -18,9 +18,9 @@ const LeftBar = () => {
         <Link to="/" className="menuIcon">
           <Image path="/general/updates.svg" alt="" />
         </Link>
-        <Link to="/" className="menuIcon">
-          <Image path="/general/messages.svg" alt="" />
-        </Link>
+      <Link to="/explore" className="menuIcon">
+  <Image path="/general/explore.svg" alt="Explore" />
+</Link>
       </div>
       <Link to="/" className="menuIcon">
         <Image path="/general/settings.svg" alt="" />

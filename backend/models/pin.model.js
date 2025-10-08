@@ -1,57 +1,65 @@
 import { Schema } from "mongoose";
 import mongoose from "mongoose";
 
-// Define the Pin schema which will store the metadata and ImageKit URL for the image/video.
+// Define the Pin schema to store pin metadata and media info.
 const pinSchema = new Schema(
-  {
-    // Stores the permanent URL provided by ImageKit.io
-    media: {
-      type: String,
-      required: true,
-    },
-    // Stores the ImageKit file ID, useful for deleting or managing the file later
-    imagekitFileId: {
-        type: String,
+  {
+    // Media URL from ImageKit.io
+    media: {
+      type: String,
+      required: true,
     },
-    // Original media dimensions for layout rendering
-    width: {
-      type: Number,
-      required: true,
-    },
-    height: {
-      type: Number,
-      required: true,
-    },
+    // ImageKit file ID, if you need to manage/delete the file later
+    imagekitFileId: {
+      type: String,
+    },
+    // Original media dimensions for UI layout
+    width: {
+      type: Number,
+      required: true,
+    },
+    height: {
+      type: Number,
+      required: true,
+    },
     // Pin details
-    title: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    // Optional external link
-    link: {
-      type: String,
-    },
-    // References the board this pin belongs to (optional)
-    board: {
-      type: Schema.Types.ObjectId,
-      ref: "Board",
-    },
-    // Searchable tags
-    tags: {
-      type: [String],
-    },
-    // Creator of the pin
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-  },
-  { timestamps: true }
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    // Optional: External link associated with the pin
+    link: {
+      type: String,
+    },
+    // Board reference (optional)
+    board: {
+      type: Schema.Types.ObjectId,
+      ref: "Board",
+    },
+    // Tags for search/discovery
+    tags: {
+      type: [String],
+    },
+    // Creator of the pin (required)
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    // Array of user IDs who liked the pin (for dashboard counts and user interaction)
+    likes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      }
+    ],
+  },
+  { timestamps: true }
 );
 
+// Exports the model for use in controllers and routes.
 export default mongoose.model("Pin", pinSchema);
