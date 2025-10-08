@@ -8,10 +8,11 @@ import {
   followUser,
   verifyOTP,
   forgotPassword,
-  resetPassword
+  resetPassword,
+
 } from "../controllers/user.controller.js";
 import { isAuthenticated } from "../middlewares/auth.js"; 
-import { getUserDashboard } from "../controllers/user.controller.js";
+import { getUserDashboard,getPinStats } from "../controllers/user.controller.js";
 const router = express.Router();
 
 router.post("/auth/register", registerUser);           
@@ -36,10 +37,11 @@ router.post("/auth/password/forgot", forgotPassword);  
 // 2. Reset Password (Uses the token from the email to set a new password)
 router.put("/auth/password/reset/:token", resetPassword); 
 
-
+router.get("/stats", isAuthenticated, getPinStats);
 router.get("/:username", getUser); 
 
 // 2. Follow/Unfollow User (Protected route)
 router.post("/follow/:username", isAuthenticated, followUser); 
+
 
 export default router;

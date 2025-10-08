@@ -133,7 +133,8 @@ import Pin from "../models/pin.model.js";
 import Comment from "../models/comment.model.js";
 import Like from "../models/like.model.js"; 
 import { sendEmail } from "../utils/sendEmail.js";
-
+// import Pin from "../models/pin.model.js"; // You'll need to import the Pin model
+import mongoose from "mongoose";
 // MOCK/PLACEHOLDER for ErrorHandler (From your error.js)
 const ErrorHandler = class extends Error {
   constructor(message, statusCode) {
@@ -749,5 +750,58 @@ export const getUserDashboard = async (req, res) => {
 };
 
 
+export const getPinStats = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const last7Days = new Date();
+        last7Days.setDate(last7Days.getDate() - 7);
 
+        // 1. Get user's pins to find their IDs
+        const userPins = await Pin.find({ user: userId }).select('_id');
+        const pinIds = userPins.map(p => p._id);
 
+        // 2. Run all three aggregations in parallel for speed
+        const [pinData, likeData, commentData] = await Promise.all([
+            // Aggregation for Pins created
+            Pin.aggregate([
+                { $match: { user: new mongoose.Types.ObjectId(userId), createdAt: { $gte: last7Days } } },
+                { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } }
+            ]),
+            // Aggregation for Likes received on user's pins
+            Like.aggregate([
+                { $match: { pin: { $in: pinIds }, createdAt: { $gte: last7Days } } },
+                { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } }
+            ]),
+            // Aggregation for Comments received on user's pins
+            Comment.aggregate([
+                { $match: { pin: { $in: pinIds }, createdAt: { $gte: last7Days } } },
+                { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } }
+            ])
+        ]);
+
+        // 3. Combine the results into a single structure
+        const combinedStats = {};
+        const processData = (data, key) => {
+            data.forEach(item => {
+                const date = item._id;
+                if (!combinedStats[date]) {
+                    combinedStats[date] = { date, pins: 0, likes: 0, comments: 0 };
+                }
+                combinedStats[date][key] = item.count;
+            });
+        };
+
+        processData(pinData, 'pins');
+        processData(likeData, 'likes');
+        processData(commentData, 'comments');
+        
+        // Convert to array and sort by date
+        const finalData = Object.values(combinedStats).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        res.status(200).json(finalData);
+
+    } catch (error) {
+        console.error("Error fetching combined pin stats:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};

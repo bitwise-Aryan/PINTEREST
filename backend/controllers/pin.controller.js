@@ -615,3 +615,7 @@ export const deletePin = async (req, res) => {
     res.status(500).json({ message: "Failed to delete pin.", error: error.message });
   }
 };
+
+
+
+

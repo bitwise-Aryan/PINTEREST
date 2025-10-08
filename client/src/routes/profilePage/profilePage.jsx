@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import apiRequest from "../../utils/apiRequest";
 import FollowButton from "./FollowButton";
+import DashboardChart from "../../components/DashboardChart/DashboardChart";
 
 const ProfilePage = () => {
   const [type, setType] = useState("saved");
@@ -113,7 +114,7 @@ const ProfilePage = () => {
         ) : null}
       </div>
       {/* END DASHBOARD SECTION */}
-
+        <DashboardChart />
       <div className="profileOptions">
         <span
           onClick={() => setType("created")}
