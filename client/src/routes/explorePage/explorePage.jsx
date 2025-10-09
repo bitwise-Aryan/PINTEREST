@@ -1,60 +1,77 @@
-// src/routes/explorePage/explorePage.jsx
-import React from 'react';
-import ExploreCard from '../../components/ExploreCard/ExploreCard'; // Adjust path if needed
-import './explorePage.css'; // New styles for the page
+// In src/pages/explorePage/ExplorePage.jsx
 
-// Mock data for the related interests section
-const relatedInterests = [
-  { title: "Aesthetic Art", imagePath: "/images/aesthetic_art.jpg" },
-  { title: "Funky Art", imagePath: "/images/funky_art.jpg" },
-  { title: "Weird Art", imagePath: "/images/weird_art.jpg" },
-  { title: "Art Inspo", imagePath: "/images/art_inspo.jpg" },
-  { title: "Art Styles", imagePath: "/images/art_styles.jpg" },
-];
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import apiRequest from '../../utils/apiRequest';
+import GalleryItem from '../../components/galleryitem/Galleryitems'; // Re-use your GalleryItem
+import Skeleton from '../../components/skeleton/skeleton'; // Re-use your Skeleton
+import useAuthStore from '../../utils/authStore';
+import '../../components/gallery/gallery.css';
+import './ExplorePage.css';
 
 const ExplorePage = () => {
+  const { currentUser } = useAuthStore();
+  // Query 1: Fetch popular tags
+  // const { data: popularTags, isLoading: tagsLoading } = useQuery({
+  //   queryKey: ['popularTags'],
+  //   queryFn: () => apiRequest.get('/pins/tags/popular').then(res => res.data),
+  // });
+
+
+  // This query is now dynamic:
+  // - If a user is logged in, it fetches their personal "related" tags.
+  // - If no user is logged in, it falls back to "popular" tags.
+
+  const { data: interestTags, isLoading: tagsLoading } = useQuery({
+    queryKey: currentUser ? ['relatedTags', currentUser._id] : ['popularTags'],
+    queryFn: () => {
+      const url = currentUser ? '/pins/related-tags' : '/pins/tags/popular';
+      return apiRequest.get(url).then(res => res.data);
+    },
+  });
+
+  // Query 2: Fetch trending pins
+  const { data: trendingData, isLoading: trendingLoading } = useQuery({
+    queryKey: ['trendingPins'],
+    queryFn: () => apiRequest.get('/pins/trending').then(res => res.data),
+  });
+
   return (
-    <div className="explore-page">
-      {/* 1. Main Banner Section */}
-      <div className="explore-banner">
-        <div className="banner-image-container">
-          {/* Use the Image component from your project or a standard img tag */}
-          <img 
-            src="/images/art_category_banner.jpg" 
-            alt="Art Category Banner" 
-            className="banner-bg-image" 
-          />
-        </div>
-        <div className="banner-content">
-          <button className="explore-button">Explore</button>
-          <h1>Art</h1>
-          <p>
-            Art has the power to move you. Pinterest has everything you need to inspire your next
-            project and discover new artists.
-          </p>
+    <div className="explorePage">
+      <div className="artBanner">
+        <div className="bannerContent">
+          <h2>Explore Art</h2>
+          <p>Art has the power to move you. Discover new artists and inspire your next project.</p>
+          <button>Explore</button>
         </div>
       </div>
 
-      {/* 2. Related Interests Section */}
-      <div className="related-interests-section">
-        <h2>Related interests</h2>
-        <div className="interest-cards-container">
-          {relatedInterests.map((interest) => (
-            <ExploreCard 
-              key={interest.title} 
-              title={interest.title} 
-              imagePath={interest.imagePath} 
-            />
-          ))}
+      <div className="relatedInterests">
+        <h3>{currentUser ? "Related Interests" : "Popular Topics"}</h3>
+        <div className="tagList">
+          {tagsLoading ? (
+            <p>Loading tags...</p>
+          ) : (
+            interestTags?.map((tag, index) => (
+              <Link to={`/search?search=${tag}`} key={index} className="tagItem">
+                {tag}
+              </Link>
+            ))
+          )}
         </div>
-        <button className="see-more-button">See more</button>
       </div>
-
-      {/* Placeholder for the main feed/pin grid below the categories */}
-      <div className="main-explore-feed">
-        {/* Your PinGrid component or content list goes here */}
+      <div className="trendingPins">
         <h3>Trending Pins</h3>
-        {/* <PinGrid /> */}
+        {trendingLoading ? (
+          <Skeleton />
+        ) : (
+          <div className="gallery">
+            {trendingData?.pins?.map(item => (
+              <GalleryItem key={item._id} item={item} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

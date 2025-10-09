@@ -27,19 +27,27 @@ import {
   createPin,
   interactionCheck,
   interact,
-  deletePin
+  deletePin,
+  getPopularTags,
+  getTrendingPins,
+  getRelatedTags
 } from "../controllers/pin.controller.js";
 // FIX: Replace the old verifyToken with the new isAuthenticated middleware
 import { isAuthenticated } from "../middlewares/auth.js"; 
 
 const router = express.Router();
 
+router.get("/tags/popular", getPopularTags);
+router.get("/trending", getTrendingPins);
+router.get("/related-tags", isAuthenticated, getRelatedTags);
 router.get("/", getPins);
 router.get("/:id", getPin);
 
 // FIX: Protected route using isAuthenticated
 router.post("/", isAuthenticated, createPin); 
+
 router.get("/interaction-check/:id", interactionCheck);
 router.post("/interact/:id",isAuthenticated, interact);
 router.delete("/:id", isAuthenticated, deletePin);
+
 export default router;

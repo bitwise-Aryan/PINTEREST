@@ -659,4 +659,115 @@ export const deletePin = async (req, res) => {
 
 
 
+export const getPopularTags = async (req, res) => {
+    try {
+        // This pipeline finds the most frequently used tags across all pins
+        const popularTags = await Pin.aggregate([
+            // Step 1: Deconstruct the tags and aiTags arrays into individual documents
+            { $unwind: { path: "$tags", preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: "$aiTags", preserveNullAndEmptyArrays: true } },
+            // Step 2: Combine user tags and AI tags into a single field
+            { $project: { tag: { $ifNull: ["$tags", "$aiTags"] } } },
+            // Step 3: Group by the tag name and count occurrences
+            { $group: { _id: "$tag", count: { $sum: 1 } } },
+            // Step 4: Sort by the most popular tags first
+            { $sort: { count: -1 } },
+            // Step 5: Limit to the top 10 results
+            { $limit: 10 },
+            // Step 6: Format the output
+            { $project: { _id: 0, tag: "$_id" } }
+        ]);
+
+        res.status(200).json(popularTags.map(item => item.tag));
+
+    } catch (error) {
+        console.error("Error fetching popular tags:", error);
+        res.status(500).json({ message: "Failed to fetch popular tags." });
+    }
+};
+
+
+
+export const getTrendingPins = async (req, res) => {
+    try {
+        // Calculate the date 7 days ago to define our "trending" window
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const trendingPins = await Pin.aggregate([
+            // Step 1: Only consider pins created in the last 7 days
+            { $match: { createdAt: { $gte: sevenDaysAgo } } },
+            
+            // Step 2: Get the counts of likes and comments for each pin
+            { $lookup: { from: "likes", localField: "_id", foreignField: "pin", as: "likeDocs" } },
+            { $lookup: { from: "comments", localField: "_id", foreignField: "pin", as: "commentDocs" } },
+
+            // Step 3: Calculate a "trendingScore"
+            // We give more weight to comments than likes
+            {
+                $addFields: {
+                    trendingScore: {
+                        $add: [
+                            { $size: "$likeDocs" }, // 1 point per like
+                            { $multiply: [{ $size: "$commentDocs" }, 2] } // 2 points per comment
+                        ]
+                    }
+                }
+            },
+            
+            // Step 4: Sort by the highest score
+            { $sort: { trendingScore: -1 } },
+            
+            // Step 5: Limit to the top 20 trending pins
+            { $limit: 20 }
+        ]);
+        
+        // Populate the user data for the frontend
+        await Pin.populate(trendingPins, { path: "user", select: "username displayName img" });
+
+        res.status(200).json({ pins: trendingPins });
+
+    } catch (error) {
+        console.error("Error fetching trending pins:", error);
+        res.status(500).json({ message: "Failed to fetch trending pins." });
+    }
+};
+
+
+export const getRelatedTags = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        // Step 1: Find all pins the user has liked or saved
+        const likedPins = await Like.find({ user: userId }).select('pin');
+        const savedPins = await Save.find({ user: userId }).select('pin');
+        
+        const pinIds = [
+            ...likedPins.map(p => p.pin),
+            ...savedPins.map(p => p.pin)
+        ];
+
+        if (pinIds.length === 0) {
+            return res.status(200).json([]); // Return empty if user has no activity
+        }
+
+        // Step 2: Use aggregation to find the most common tags from those pins
+        const relatedTags = await Pin.aggregate([
+            { $match: { _id: { $in: pinIds } } },
+            { $unwind: { path: "$tags", preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: "$aiTags", preserveNullAndEmptyArrays: true } },
+            { $project: { tag: { $ifNull: ["$tags", "$aiTags"] } } },
+            { $group: { _id: "$tag", count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 10 },
+            { $project: { _id: 0, tag: "$_id" } }
+        ]);
+
+        res.status(200).json(relatedTags.map(item => item.tag).filter(Boolean)); // filter(Boolean) removes any nulls
+
+    } catch (error) {
+        console.error("Error fetching related tags:", error);
+        res.status(500).json({ message: "Failed to fetch related tags." });
+    }
+};
 
