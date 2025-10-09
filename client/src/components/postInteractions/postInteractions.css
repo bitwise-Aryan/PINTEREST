@@ -97,3 +97,17 @@
 .moreMenu span:hover {
   background-color: #f0f0f0;
 }
+
+.similarButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.similarButton:hover {
+  transform: scale(1.2);
+}

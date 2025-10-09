@@ -282,6 +282,7 @@ import Board from "../models/board.model.js";
 import sharp from "sharp";
 import Imagekit from "imagekit";
 import jwt from "jsonwebtoken";
+import { Pinecone } from '@pinecone-database/pinecone';
 import { ClarifaiStub, grpc } from "clarifai-nodejs-grpc";
 
 
@@ -342,6 +343,12 @@ export const getPin = async (req, res) => {
 };
 
 
+// Initialize Pinecone Client
+const pc = new Pinecone({
+    // environment: process.env.PINECONE_ENVIRONMENT,
+    apiKey: process.env.PINECONE_API_KEY,
+});
+const pineconeIndex = pc.index('pinterest-pins'); // Use the index name you created
 
 export const createPin = async (req, res) => {
     const {
@@ -445,7 +452,12 @@ export const createPin = async (req, res) => {
 console.log("CLARIFAI_APP_ID:", process.env.CLARIFAI_APP_ID);
 console.log("CLARIFAI_API_KEY (first 8 chars):", process.env.CLARIFAI_API_KEY && process.env.CLARIFAI_API_KEY.slice(0,8));
         let generatedAiTags = [];
+        let imageVector = []; // <-- Variable to hold our vector
         try {
+            if (!process.env.CLARIFAI_API_KEY) {
+                throw new Error("Clarifai API Key is missing");
+            }
+              
             const stub = ClarifaiStub.grpc();
             const metadata = new grpc.Metadata();
             metadata.set("authorization", "Key " + process.env.CLARIFAI_API_KEY);
@@ -456,7 +468,8 @@ console.log("CLARIFAI_API_KEY (first 8 chars):", process.env.CLARIFAI_API_KEY &&
                     {
                         // The user_app_id object has been REMOVED.
                         // Your API key in the metadata handles authentication.
-                        workflow_id: "General",
+                        // workflow_id: "General",
+                        workflow_id: "tag-and-embed",
                         inputs: [{ data: { image: { url: response.url } } }],
                     },
                     metadata,
@@ -470,7 +483,12 @@ console.log("CLARIFAI_API_KEY (first 8 chars):", process.env.CLARIFAI_API_KEY &&
             if (clarifaiResponse.status.code !== 10000) {
                 throw new Error("Clarifai API Error: " + clarifaiResponse.status.description);
             }
-
+            // --- THIS IS THE NEW PART ---
+            // 1. Extract the vector embedding from the Clarifai response
+            const embedding = clarifaiResponse.results?.[0]?.outputs?.[1]?.data?.embeddings?.[0];
+            if (embedding) {
+                imageVector = embedding.vector;
+            }
             const concepts = clarifaiResponse.results?.[0]?.outputs?.[0]?.data?.concepts ?? [];
             if (concepts) {
                 generatedAiTags = concepts
@@ -505,6 +523,23 @@ console.log("CLARIFAI_API_KEY (first 8 chars):", process.env.CLARIFAI_API_KEY &&
             height: response.height,
             aiTags: generatedAiTags // Save the new AI tags
         });
+
+        // --- THIS IS ALSO NEW ---
+        // 2. Save the vector to Pinecone if it exists
+        if (imageVector.length > 0) {
+            try {
+                console.log("Attempting to save vector to Pinecone...");
+                await pineconeIndex.upsert([{
+                    id: newPin._id.toString(),
+                    values: imageVector,
+                }]);
+                console.log("✅ Vector saved to Pinecone successfully!");
+            } catch (pineconeError) {
+                console.error("!!! Pinecone Save Failed:", pineconeError);
+            }
+        } else {
+            console.log("Skipping Pinecone save because no vector was generated.");
+        }
         return res.status(201).json(newPin);
     })
     .catch((err) => {
@@ -771,3 +806,41 @@ export const getRelatedTags = async (req, res) => {
     }
 };
 
+
+export const getSimilarPins = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // 1. Fetch the vector for the source pin from Pinecone using its ID
+        const fetchResponse = await pineconeIndex.fetch([id]);
+        const sourceVector = fetchResponse.records[id]?.values;
+
+        if (!sourceVector) {
+            return res.status(404).json({ message: "Vector for this pin not found. Please upload it again to generate one." });
+        }
+
+        // 2. Query Pinecone to find the 10 most similar vectors
+        const queryResponse = await pineconeIndex.query({
+            vector: sourceVector,
+            topK: 2, 
+        });
+
+        // 3. Get the IDs of the similar pins, excluding the source pin itself
+        const similarPinIds = queryResponse.matches
+            .filter(match => match.id !== id)
+            .map(match => match.id);
+
+        if (similarPinIds.length === 0) {
+            return res.status(200).json([]);
+        }
+
+        // 4. Fetch the full pin data for those IDs from MongoDB
+        const similarPins = await Pin.find({ _id: { $in: similarPinIds } });
+        
+        res.status(200).json(similarPins);
+
+    } catch (error) {
+        console.error("Error fetching similar pins:", error);
+        res.status(500).json({ message: "Failed to fetch similar pins." });
+    }
+};

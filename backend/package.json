@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@pinecone-database/pinecone": "^6.1.2",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "clarifai": "^2.9.1",

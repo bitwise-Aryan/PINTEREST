@@ -142,6 +142,7 @@ const ForgotPassword = React.lazy(() => import("./routes/ForgotPassword/ForgotPa
 const ResetPassword = React.lazy(() => import("./routes/ResetPassword/ResetPassword"));
 const OtpVerification = React.lazy(() => import("./routes/OtpVerification/OtpVerification"));
 const ExplorePage = React.lazy(() => import("./routes/explorePage/explorePage")); // Correctly added
+const SimilarPinsPage = React.lazy(() => import("./routes/similarPinsPage/SimilarPinsPage"));
 
 // --- Configuration ---
 const queryClient = new QueryClient();
@@ -159,6 +160,7 @@ createRoot(document.getElementById("root")).render(
                 <Route path="/" element={<Homepage />} />
                 <Route path="/explore" element={<ExplorePage />} /> {/* Correctly added */}
                 <Route path="/create" element={<CreatePage />} />
+                <Route path="/pin/:id/similar" element={<SimilarPinsPage />}/>
                 <Route path="/pin/:id" element={<PostPage />} />
                 <Route path="/profile/:username" element={<ProfilePage />} />
                 <Route path="/search" element={<SearchPage />} />

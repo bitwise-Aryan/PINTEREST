@@ -1,0 +1,33 @@
+/* In src/routes/similarPinsPage/SimilarPinsPage.css */
+.similarPinsPage {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.similarPinsPage h1 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 24px;
+  font-weight: 500;
+  color: #555;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.error-message, .info-message {
+  text-align: center;
+  margin-top: 48px;
+  font-size: 18px;
+  color: #777;
+}

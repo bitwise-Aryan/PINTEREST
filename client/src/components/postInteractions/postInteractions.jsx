@@ -74,6 +74,7 @@ import { useState } from "react";
 import useAuthStore from "../../utils/authStore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 // API function to delete a pin
 const deletePin = async (id) => {
@@ -158,7 +159,11 @@ const PostInteractions = ({ postId, pinOwner }) => {
         </svg>
         {data.likeCount}
         <Image path="/general/share.svg" alt="" />
-        
+
+        <Link to={`/pin/${postId}/similar`} className="similarButton" title="Find visually similar pins">
+          ✨
+        </Link>
+
         {/* --- THREE DOTS MENU --- */}
         <div className="moreMenuContainer">
           <Image
