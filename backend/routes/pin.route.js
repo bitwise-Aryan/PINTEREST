@@ -31,7 +31,8 @@ import {
   getPopularTags,
   getTrendingPins,
   getRelatedTags,
-  getSimilarPins
+  getSimilarPins,
+  searchByImage
 } from "../controllers/pin.controller.js";
 // FIX: Replace the old verifyToken with the new isAuthenticated middleware
 import { isAuthenticated } from "../middlewares/auth.js"; 
@@ -51,5 +52,6 @@ router.post("/", isAuthenticated, createPin);
 router.get("/interaction-check/:id", interactionCheck);
 router.post("/interact/:id",isAuthenticated, interact);
 router.delete("/:id", isAuthenticated, deletePin);
+router.post("/search-by-image", searchByImage);
 
 export default router;

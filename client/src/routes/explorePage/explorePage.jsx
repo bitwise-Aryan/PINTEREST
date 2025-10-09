@@ -9,6 +9,8 @@ import Skeleton from '../../components/skeleton/skeleton'; // Re-use your Skelet
 import useAuthStore from '../../utils/authStore';
 import '../../components/gallery/gallery.css';
 import './ExplorePage.css';
+import Gallery from '../../components/gallery/gallery';
+import VisualSearch from '../../components/visualSearch/VisualSearch';
 
 const ExplorePage = () => {
   const { currentUser } = useAuthStore();
@@ -39,13 +41,8 @@ const ExplorePage = () => {
 
   return (
     <div className="explorePage">
-      <div className="artBanner">
-        <div className="bannerContent">
-          <h2>Explore Art</h2>
-          <p>Art has the power to move you. Discover new artists and inspire your next project.</p>
-          <button>Explore</button>
-        </div>
-      </div>
+      {/* 2. Replace the old banner with the new component */}
+      <VisualSearch />
 
       <div className="relatedInterests">
         <h3>{currentUser ? "Related Interests" : "Popular Topics"}</h3>
@@ -54,23 +51,20 @@ const ExplorePage = () => {
             <p>Loading tags...</p>
           ) : (
             interestTags?.map((tag, index) => (
-              <Link to={`/search?search=${tag}`} key={index} className="tagItem">
+              <Link to={`/?search=${tag}`} key={index} className="tagItem">
                 {tag}
               </Link>
             ))
           )}
         </div>
       </div>
+
       <div className="trendingPins">
         <h3>Trending Pins</h3>
         {trendingLoading ? (
           <Skeleton />
         ) : (
-          <div className="gallery">
-            {trendingData?.pins?.map(item => (
-              <GalleryItem key={item._id} item={item} />
-            ))}
-          </div>
+          <Gallery pins={trendingData?.pins} />
         )}
       </div>
     </div>

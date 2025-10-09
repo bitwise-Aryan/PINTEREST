@@ -1,0 +1,72 @@
+/* In src/components/visualSearch/VisualSearch.css */
+.visualSearch {
+  background-color: #f8f8f8;
+  border-radius: 24px;
+  padding: 48px;
+  text-align: center;
+  margin-bottom: 48px;
+}
+.visualSearch h2 {
+  font-size: 36px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.visualSearch p {
+  color: #555;
+  margin-bottom: 24px;
+}
+.uploader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+.uploader input[type="file"] {
+  display: none;
+}
+.uploadLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #777;
+  overflow: hidden;
+  transition: background-color 0.2s ease;
+}
+.uploadLabel:hover {
+  background-color: #efefef;
+  border-color: #ccc;
+}
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.uploader button {
+  background-color: #111;
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.uploader button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.resultsSection {
+  margin-top: 48px;
+  text-align: left;
+}
+.resultsSection h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}

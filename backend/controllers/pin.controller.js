@@ -844,3 +844,66 @@ export const getSimilarPins = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch similar pins." });
     }
 };
+
+
+export const searchByImage = async (req, res) => {
+    try {
+        if (!req.files || !req.files.media) {
+            return res.status(400).json({ message: "No image file uploaded." });
+        }
+
+        const imageFile = req.files.media.data; // Image data from the upload
+
+        // 1. Get the vector for the uploaded image from Clarifai
+        let queryVector = [];
+        const stub = ClarifaiStub.grpc();
+        const metadata = new grpc.Metadata();
+        metadata.set("authorization", "Key " + process.env.CLARIFAI_API_KEY);
+
+        const clarifaiResponse = await new Promise((resolve, reject) => {
+            stub.PostWorkflowResults(
+                {
+                    workflow_id: "tag-and-embed",
+                    inputs: [{ data: { image: { base64: imageFile } } }], // Send image bytes
+                },
+                metadata,
+                (err, response) => {
+                    if (err) reject(err);
+                    resolve(response);
+                }
+            );
+        });
+
+        if (clarifaiResponse.status.code !== 10000) {
+            throw new Error("Clarifai API Error: " + clarifaiResponse.status.description);
+        }
+
+        const embedding = clarifaiResponse.results?.[0]?.outputs?.[1]?.data?.embeddings?.[0];
+        if (embedding) {
+            queryVector = embedding.vector;
+        } else {
+            throw new Error("Could not generate a vector for the uploaded image.");
+        }
+
+        // 2. Use the new vector to query Pinecone
+        const queryResponse = await pineconeIndex.query({
+            vector: queryVector,
+            topK: 2,
+        });
+
+        const similarPinIds = queryResponse.matches.map(match => match.id);
+
+        if (similarPinIds.length === 0) {
+            return res.status(200).json([]);
+        }
+
+        // 3. Fetch the full pin data from MongoDB
+        const similarPins = await Pin.find({ _id: { $in: similarPinIds } });
+        
+        res.status(200).json(similarPins);
+
+    } catch (error) {
+        console.error("Error in visual search:", error);
+        res.status(500).json({ message: "Failed to perform visual search." });
+    }
+};
