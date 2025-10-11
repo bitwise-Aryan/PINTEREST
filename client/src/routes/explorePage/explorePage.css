@@ -1,69 +1,89 @@
-/* In src/pages/explorePage/ExplorePage.css */
-
+/* General page container styling */
 .explorePage {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
+    /* Center the page content with a max-width for better readability on large screens */
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 2rem 1rem; /* Padding for mobile and desktop */
+    min-height: 100vh;
+    background-color: #f7f7f7; /* Light background for contrast */
 }
 
-.artBanner {
-  background-color: #f0e4e4;
-  border-radius: 24px;
-  padding: 48px;
-  text-align: center;
-  margin-bottom: 48px;
+/* --- Heading Styles --- */
+.explorePage h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1f2937; /* Dark text for focus */
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 3px solid #dc2626; /* Highlight with your brand color */
+    display: inline-block;
+    padding-bottom: 5px;
 }
 
-.bannerContent h2 {
-  font-size: 36px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.bannerContent p {
-  color: #555;
-  margin-bottom: 24px;
-}
-
-.bannerContent button {
-  background-color: #111;
-  color: #fff;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 24px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.relatedInterests, .trendingPins {
-  margin-bottom: 48px;
-}
-
-h3 {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 16px;
+/* --- Related Interests/Popular Topics Section --- */
+.relatedInterests {
+    margin-bottom: 3rem;
 }
 
 .tagList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+    display: flex;
+    flex-wrap: wrap; /* Allows tags to wrap on smaller screens */
+    gap: 0.75rem; /* Space between tags */
 }
 
 .tagItem {
-  background-color: #efefef;
-  padding: 8px 16px;
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #111;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
+    /* Style for the individual tag links */
+    display: block; /* Ensure full link area is clickable */
+    padding: 0.75rem 1.25rem;
+    background-color: #ffffff; /* White background for the tags */
+    color: #dc2626; /* Red text for visibility */
+    border: 1px solid #dc2626;
+    border-radius: 2rem; /* Pill shape */
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Subtle lift */
+    white-space: nowrap; /* Prevents text wrap inside the tag */
 }
 
 .tagItem:hover {
-  background-color: #e0e0e0;
+    background-color: #dc2626; /* Invert colors on hover */
+    color: #ffffff;
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
 }
 
+/* --- Trending Pins Section --- */
+.trendingPins {
+    /* This section contains the Gallery component, which typically handles its own layout */
+    margin-bottom: 4rem;
+}
+
+/* Placeholder/Loading State */
+.relatedInterests p {
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .explorePage {
+        padding: 1rem 0.5rem;
+    }
+    
+    .explorePage h3 {
+        font-size: 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .tagList {
+        justify-content: center; /* Center tags on small screens */
+    }
+    
+    .tagItem {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+}
