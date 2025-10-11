@@ -1,83 +1,19 @@
-
-
-
-
-// // --- Imports from your project ---
-// import express from "express";
-// import cors from "cors";
-// import userRouter from "./routes/user.route.js"; 
-// import pinRouter from "./routes/pin.route.js";
-// import commentRouter from "./routes/comment.route.js";
-// import boardRouter from "./routes/board.route.js";
-// import connectDB from "./utils/connectDB.js"; 
-// import cookieParser from "cookie-parser";
-// import fileUpload from "express-fileupload";
-// import dotenv from "dotenv";
-// import notificationRouter from "./routes/notification.route.js"; 
-
-// // --- Imports from the complete verification system ---
-// // import { removeUnverifiedAccounts } from "./automation/removeUnverifiedAccounts.js"; 
-// import { errorMiddleware } from "./middlewares/error.js"; 
-
-// dotenv.config(); 
-
-// const app = express();
-
-// // Set allowed origins for CORS
-// const allowedOrigins = [
-//   'http://localhost:5173', // Frontend Client URL (e.g., Vite/React)
-//   'http://localhost:5174', // Secondary client/development environment
-//   // Add your deployed client URL here if applicable
-// ];
-
-// // --- Core Middleware ---
-// app.use(express.json());
-// app.use(cors({ origin: allowedOrigins, credentials: true })); 
-// app.use(cookieParser());
-// app.use(fileUpload());
-
-// // --- Automated Tasks (Runs on server start) ---
-// // removeUnverifiedAccounts(); 
-
-// // --- Routes ---
-// // The /users base path correctly routes to userRouter
-// app.use("/users", userRouter); 
-// app.use("/pins", pinRouter);
-// app.use("/comments", commentRouter);
-// app.use("/boards", boardRouter);
-// app.use("/notifications", notificationRouter);
-
-// app.use('/uploads', express.static('uploads'));
-// // --- Error Handling Middleware ---
-// app.use(errorMiddleware); 
-
-// // --- Server Startup ---
-// const PORT = process.env.PORT || 3000;
-
-// const startServer = async () => {
-//     await connectDB(); 
-//     app.listen(PORT, () => {
-//         console.log(` Server is running on port ${PORT}`);
-//     });
-// }
-
-// startServer();
-// --- src/index.js (FINAL CODE WITH SOCKET.IO FIX) ---
-
 import dotenv from 'dotenv';
 dotenv.config();
 
-// NEW: Import necessary Node.js modules for creating the server
 import http from 'http'; 
-import { Server as SocketServer } from "socket.io"; // Renamed import for clarity
-
+import { Server as SocketServer } from "socket.io";
 import express from "express";
 import cors from "cors";
+import path from 'path';
+
 import userRouter from "./routes/user.route.js"; 
 import pinRouter from "./routes/pin.route.js";
 import commentRouter from "./routes/comment.route.js";
 import boardRouter from "./routes/board.route.js";
-import notificationRouter from "./routes/notification.route.js"; // Include the new notification route
+import notificationRouter from "./routes/notification.route.js";
+import chatRouter from "./routes/chat.route.js";
+
 import connectDB from "./utils/connectDB.js"; 
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
@@ -87,63 +23,72 @@ import { errorMiddleware } from "./middlewares/error.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 1. Create the HTTP server and wrap the Express app
+// Create HTTP server and wrap Express app
 const server = http.createServer(app);
 
-// Set allowed origins for CORS (MUST include the frontend URL)
+// CORS allowed origins
 const allowedOrigins = [
-  'http://localhost:5173', // Frontend Client URL
-  'http://localhost:5174', // Secondary client/development environment
-  // Add your deployed client URL here if applicable
+  'http://localhost:5173', 
+  'http://localhost:5174',
+  // Add deployed frontend URLs as needed
 ];
 
-// 2. Initialize Socket.IO and attach it to the HTTP server
+// Initialize Socket.IO with CORS configuration
 const io = new SocketServer(server, {
-    cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"],
-        credentials: true
-    }
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
+  }
 });
 
-// --- Core Middleware ---
+// Core middleware
 app.use(express.json());
-// Ensure CORS for Express routes uses the same configuration
-app.use(cors({ origin: allowedOrigins, credentials: true })); 
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(cookieParser());
 app.use(fileUpload());
 
-// --- Routes ---
+// API routes
+app.use("/chat", chatRouter);
 app.use("/users", userRouter); 
 app.use("/pins", pinRouter);
 app.use("/comments", commentRouter);
 app.use("/boards", boardRouter);
-app.use("/notifications", notificationRouter); // Your new notification route
+app.use("/notifications", notificationRouter);
 
+// Serve uploads folder statically
 app.use('/uploads', express.static('uploads'));
-// --- Error Handling Middleware ---
-app.use(errorMiddleware); 
 
-// --- Socket.IO Connection Handler ---
-io.on('connection', (socket) => {
-    console.log('A user connected via Socket.IO:', socket.id);
+// Serve React build static files (adjust path if needed)
+app.use(express.static(path.join(process.cwd(), 'build')));
 
-    // Placeholder for real-time logic (e.g., notification broadcasting, chat)
-    
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-    });
+// SPA fallback: serve index.html on all unmatched routes for React Router
+app.get(/^\/(?!api).*/, (req, res) => {
+  // This will match everything except routes that start with /api (adjust pattern as needed)
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
-// ---------------------------------------------------------------- //
 
-// --- Server Startup ---
+// Error handling middleware (should be last)
+app.use(errorMiddleware);
+
+// Socket.IO connection handler
+io.on('connection', (socket) => {
+  console.log('A user connected via Socket.IO:', socket.id);
+
+  // Add your Socket.IO real-time events here
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+// Server start function using server.listen for Socket.IO compatibility
 const startServer = async () => {
-    await connectDB(); 
-    // IMPORTANT: Use server.listen() instead of app.listen()
-    server.listen(PORT, () => {
-        console.log(`✅ Express Server running on port ${PORT}`);
-        console.log(`📡 Socket.IO listening on port ${PORT}`);
-    });
-}
+  await connectDB(); 
+  server.listen(PORT, () => {
+    console.log(`✅ Express Server running on port ${PORT}`);
+    console.log(`📡 Socket.IO listening on port ${PORT}`);
+  });
+};
 
 startServer();

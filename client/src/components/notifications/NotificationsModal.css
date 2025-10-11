@@ -1,93 +1,221 @@
-/* --- Overlay: Takes up the whole screen and centers content --- */
+/* --- Modal Overlay: Dims the background and centers the modal. MUST have highest z-index. --- */
+/* --- Modal Overlay: Dims the background and centers the modal. MUST have highest z-index. --- */
 .notifications-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Dark semi-transparent background */
-    display: flex; /* Enable Flexbox */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    z-index: 1000; /* Ensure it's on top of everything else */
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4); /* Standard dimming */
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* INCREASED Z-INDEX FOR GUARANTEED PLACEMENT ABOVE ALL */
+    z-index: 9999; 
+    overflow: auto;
+    padding: 1rem;
+    /* Adding a subtle reddish-pink shadow to the whole overlay area (outside the modal) for a "red tincture" feel */
+    /* Note: This is a non-standard technique for an overlay, but attempts to meet the request. */
+    box-shadow: inset 0 0 500px rgba(220, 38, 38, 0.05); 
 }
 
-/* --- Modal Content Box: Defines the look and size --- */
+/* --- Modal main box: Defines the look and size --- */
 .notifications-modal {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-    width: 90%; /* Responsive width for mobile */
-    max-width: 400px; /* Max width for desktop */
-    max-height: 80%; /* Limit height so it doesn't cover the whole screen */
-    overflow-y: auto; /* Enable scrolling if content overflows */
-    padding: 20px;
-    /* Remove any absolute positioning (like bottom: 0; right: 0;) that may be causing the corner placement */
-    transform: scale(1); /* Ensure no rogue transforms are pushing it away */
+    background: #fff;
+    border-radius: 0.75rem;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    /* Adding subtle red shadow */
+    box-shadow: 
+        0 0 10px 3px rgba(220, 38, 38, 0.25), /* subtle red glow from the first block */
+        0 8px 24px rgb(0 0 0 / 0.15); /* standard shadow */
+    overflow: hidden;
+    font-family: system-ui, sans-serif;
+    position: relative;
+    /* INCREASED Z-INDEX TO BE ABOVE THE OVERLAY */
+    z-index: 10000; 
+    /* The requested reddish background tint inside the modal */
+    background-image: linear-gradient(135deg, rgba(201, 82, 100, 0.05), rgba(255, 243, 244, 0.15));
 }
 
-/* --- Header and Body styles should remain similar --- */
+/* No other CSS changes are required as the core fix is the z-index. */
+/* ... (rest of the CSS remains unchanged) ... */
+
+
+
+
+
+
+
+
+
+
+
+
+/* --- Header --- */
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: #f9fafb;
 }
 
 .modal-header h3 {
-    margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
 }
 
 .close-btn {
-    background: none;
+    background: transparent;
     border: none;
     font-size: 1.5rem;
+    line-height: 1;
     cursor: pointer;
-    color: #333;
+    color: #6b7280;
+    transition: color 0.2s ease-in-out;
 }
 
-/* Add basic style for notification items */
+.close-btn:hover {
+    color: #dc2626;
+}
+
+/* --- Body with scrollbar --- */
+.modal-body {
+    padding: 1rem 1.5rem;
+    overflow-y: auto; /* Vertical scrolling for the list */
+    flex-grow: 1;
+    /* Simplified scrollbar styling to make the content scrollbar less distracting/red */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #a8a29e #f3f4f6; /* Simplified to a less distracting color */
+}
+
+/* Scrollbar styling for webkit browsers on the main body */
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background-color: #a8a29e; /* Simplified to a less distracting color */
+    border-radius: 10px;
+}
+
+/* --- Empty state message --- */
+.empty-state {
+    color: #9ca3af;
+    font-style: italic;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* --- Notification item --- */
 .notification-item {
     display: flex;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 0.75rem 0.5rem;
     cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.notification-item:last-child {
-    border-bottom: none;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease;
+    column-gap: 0.75rem;
+    user-select: none;
 }
 
 .notification-item:hover {
-    background-color: #f7f7f7;
+    background-color: #fef2f2;
 }
 
+/* Read vs unread */
+.notification-item.unread {
+    background-color: #fee2e2;
+}
+
+.notification-item.read {
+    background-color: transparent;
+}
+
+/* --- Sender Image --- */
 .sender-img {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    margin-right: 15px;
+    border-radius: 9999px;
     object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 0 5px rgba(220, 38, 38, 0.7);
 }
 
+/* --- Notification content --- */
 .notification-content {
-    flex-grow: 1;
-}
-
-.notification-content p {
-    margin: 0;
-    line-height: 1.4;
+    flex: 1;
     font-size: 0.9rem;
+    color: #1f2937;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* FIX: Remove horizontal scrolling and force text wrap for full comment visibility. */
+    white-space: normal; /* Allow text to wrap */
+    max-width: unset; /* Remove max-width constraint */
+    overflow-x: hidden; /* Ensure no horizontal scrollbar appears */
+    /* Remove unnecessary scrollbar styles that only show a thin red line */
+    scrollbar-width: none; 
 }
 
+/* Remove scrollbar styling for webkit browsers on notification-content */
+.notification-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* Sender name bold */
+.sender-name {
+    font-weight: 600;
+    margin-right: 0.3rem;
+    user-select: text;
+    /* Ensure the sender name and message are in the same flow */
+    display: inline;
+}
+
+/* The message text itself needs to follow the sender-name on the same line if possible */
+.notification-message-line {
+    display: inline;
+}
+
+/* Timestamp smaller, lighter */
 .timestamp {
-    display: block;
-    font-size: 0.75rem;
-    color: #888;
-    margin-top: 2px;
+    font-size: 0.7rem;
+    color: #6b7280;
+    margin-top: 0.1rem;
+    white-space: nowrap;
+    user-select: text;
+}
+
+/* Pin preview container */
+.pin-preview-container {
+    width: 50px;
+    height: 50px;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgb(220 38 38 / 0.3);
+}
+
+/* Pin preview image */
+.pin-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.pin-preview-container:hover .pin-preview-img {
+    transform: scale(1.05);
 }

@@ -58,16 +58,71 @@ const sendToken = (user, statusCode, message, res) => {
 
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-
-// Utility function to generate email content
+// Utility function to generate appealing HTML email content for the verification code
 function generateEmailTemplate(verificationCode) {
-  return `
-    <div style="font-family: Arial, sans-serif;">
-      <h2>Verification Code</h2>
-      <p>Your verification code is: <strong>${verificationCode}</strong></p>
-      <p>This code will expire in 10 minutes.</p>
-    </div>
-  `;
+    // The HTML email uses inline styles and table layouts for maximum compatibility and appeal.
+    return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Verification Code</title>
+        <style>
+            /* Global reset and styling for email clients */
+            body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+            table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        </style>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+            <tr>
+                <td align="center" style="padding: 20px 0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 400px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                        
+                        <tr>
+                            <td align="center" style="background-color: #007bff; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                                <h1 style="margin: 0; font-size: 24px; color: #ffffff; font-weight: bold;">Account Verification</h1>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 30px 40px; color: #333333; font-size: 16px; line-height: 1.6; text-align: center;">
+                                <p style="margin-top: 0; margin-bottom: 20px;">Use the code below to complete your sign-in or verification process. Do not share this code with anyone.</p>
+                                
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td align="center" style="padding: 15px 20px; background-color: #e6f0ff; border-radius: 6px; border: 2px dashed #007bff;">
+                                            <p style="margin: 0; font-size: 32px; color: #007bff; font-weight: bold; letter-spacing: 5px;">
+                                                ${verificationCode}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p style="margin-top: 25px; margin-bottom: 5px; font-size: 14px; color: #dc3545;">
+                                    <strong>🚨 IMPORTANT:</strong> This code will expire in **10 minutes**.
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td align="center" style="padding: 20px 40px; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee;">
+                                <p style="margin-top: 0; margin-bottom: 5px;">
+                                    This verification is managed by the **TechStack Team**.
+                                </p>
+                                <p style="margin-bottom: 0;">
+                                    &copy; ${new Date().getFullYear()} TeckStack. All rights reserved.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
 }
 
 console.log('Account SID:', process.env.TWILIO_ACCOUNT_SID);
@@ -531,79 +586,105 @@ export const forgotPassword = catchAsyncError(async (req, res, next) => {
   const resetPasswordUrl = `${process.env.CLIENT_URL}/password/reset/${resetToken}`;
 
   // Improved HTML email template
-  const htmlMessage = `
+ // Improved HTML email template for better design and deliverability
+const htmlMessage = `
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; }
-        .content { background-color: #f9f9f9; padding: 20px; }
-        .button { 
-          display: inline-block; 
-          padding: 12px 24px; 
-          background-color: #4CAF50; 
-          color: white; 
-          text-decoration: none; 
-          border-radius: 5px;
-          margin: 20px 0;
-        }
-        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
-        .warning { background-color: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 15px 0; }
-      </style>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Password Reset Request</title>
+        <style>
+            /* Global reset and styling */
+            body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+            table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+            img { -ms-interpolation-mode: bicubic; }
+            a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
+        </style>
     </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>Password Reset Request</h1>
-        </div>
-        <div class="content">
-          <h2>Hello ${user.displayName || user.username},</h2>
-          <p>We received a request to reset your password. Click the button below to reset it:</p>
-          
-          <div style="text-align: center;">
-            <a href="${resetPasswordUrl}" class="button">Reset Password</a>
-          </div>
-          
-          <p>Or copy and paste this link into your browser:</p>
-          <p style="word-break: break-all; color: #4CAF50;">${resetPasswordUrl}</p>
-          
-          <div class="warning">
-            <strong>⚠️ Security Notice:</strong>
-            <ul>
-              <li>This link will expire in 10 minutes</li>
-              <li>If you didn't request this, please ignore this email</li>
-              <li>Your password won't change until you access the link above</li>
-            </ul>
-          </div>
-        </div>
-        <div class="footer">
-          <p>This is an automated email, please do not reply.</p>
-          <p>&copy; ${new Date().getFullYear()} Your App Name. All rights reserved.</p>
-        </div>
-      </div>
+    <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+            <tr>
+                <td align="center" style="padding: 20px 0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                        
+                        <tr>
+                            <td align="center" style="background-color: #3f72af; padding: 30px 20px; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                                <h1 style="margin: 0; font-size: 28px; color: #ffffff; font-weight: bold;">Password Reset</h1>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding: 30px 40px; color: #333333; font-size: 16px; line-height: 1.6;">
+                                <h2 style="margin-top: 0; margin-bottom: 20px; font-size: 22px; color: #1f2937;">Hello ${user.displayName || user.username},</h2>
+
+                                <p style="margin-bottom: 20px;">We're processing your request to reset the password for your account. To proceed, please click the secure button below. This action ensures the security of your account.</p>
+                                
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td align="center" style="padding: 20px 0;">
+                                            <table border="0" cellpadding="0" cellspacing="0">
+                                                <tr>
+                                                    <td align="center" style="border-radius: 5px; background-color: #3f72af;">
+                                                        <a href="${resetPasswordUrl}" target="_blank" style="font-size: 16px; font-weight: bold; text-decoration: none; color: #ffffff; padding: 12px 25px; border-radius: 5px; display: inline-block;">
+                                                            Reset Your Password
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <p style="margin-top: 10px;">If the button above doesn't work, you can copy and paste the following link into your browser:</p>
+                                <p style="word-break: break-all; font-size: 14px; color: #3f72af; font-weight: bold; background-color: #e6f0ff; padding: 8px; border-radius: 4px;">${resetPasswordUrl}</p>
+                                
+                                <div style="background-color: #fff8e1; padding: 15px; border-left: 5px solid #ffc107; margin: 30px 0; border-radius: 4px;">
+                                    <strong style="color: #6a0000;">⚠️ Important Security Notice:</strong>
+                                    <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0; font-size: 14px; color: #555;">
+                                        <li>This password reset link will expire in **10 minutes** for your security.</li>
+                                        <li>If you did not initiate this request, please **ignore this email**. Your current password will remain unchanged.</li>
+                                        <li>For security, no further action is required unless you intentionally clicked the reset link.</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td align="center" style="padding: 20px 40px; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee;">
+                                <p style="margin-top: 0; margin-bottom: 5px;">This email was sent by the **TechStack Team** as an automated notification. Please do not reply directly to this message.</p>
+                                <p style="margin-bottom: 0;">&copy; ${new Date().getFullYear()} Team TechStack. All rights reserved.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
     </body>
     </html>
-  `;
+`;
 
-  // Plain text fallback
-  const plainTextMessage = `
+// Plain text fallback
+const plainTextMessage = `
 Password Reset Request
 
 Hello ${user.displayName || user.username},
 
-We received a request to reset your password. Click the link below to reset it:
+We received a request to reset your password. To ensure the security of your account, please use the secure link below to proceed:
 
 ${resetPasswordUrl}
 
-This link will expire in 10 minutes.
-
-If you didn't request this, please ignore this email. Your password won't change until you access the link above.
+Important Security Notice:
+- This link will expire in 10 minutes.
+- If you didn't request this, please ignore this email. Your password won't change until you access the link above.
 
 ---
-This is an automated email, please do not reply.
-  `;
+This email was sent by the TechStack Team as an automated notification. Please do not reply.
+`;
+
+  // Plain text fallback
+  
+
 
   try {
     await sendEmail({
