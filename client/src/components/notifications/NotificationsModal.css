@@ -1,0 +1,93 @@
+/* --- Overlay: Takes up the whole screen and centers content --- */
+.notifications-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Dark semi-transparent background */
+    display: flex; /* Enable Flexbox */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    z-index: 1000; /* Ensure it's on top of everything else */
+}
+
+/* --- Modal Content Box: Defines the look and size --- */
+.notifications-modal {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    width: 90%; /* Responsive width for mobile */
+    max-width: 400px; /* Max width for desktop */
+    max-height: 80%; /* Limit height so it doesn't cover the whole screen */
+    overflow-y: auto; /* Enable scrolling if content overflows */
+    padding: 20px;
+    /* Remove any absolute positioning (like bottom: 0; right: 0;) that may be causing the corner placement */
+    transform: scale(1); /* Ensure no rogue transforms are pushing it away */
+}
+
+/* --- Header and Body styles should remain similar --- */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+}
+
+/* Add basic style for notification items */
+.notification-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background-color: #f7f7f7;
+}
+
+.sender-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.notification-content {
+    flex-grow: 1;
+}
+
+.notification-content p {
+    margin: 0;
+    line-height: 1.4;
+    font-size: 0.9rem;
+}
+
+.timestamp {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 2px;
+}

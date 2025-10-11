@@ -1,51 +1,8 @@
-// // import Comment from "../models/comment.model.js";
-// // // import User from "../models/user.model.js";
-// // export const getPostComments = async (req, res) => {
-// //   const { postId } = req.params;
-// //   const comments = await Comment.find({ pin: postId })
-// //     .populate("user", "username img displayName")
-// //     .sort({ createdAt: -1 });
-// //   res.status(200).json(comments);
-// // };
 
-// // export const addComment = async (req, res) => {
-// //   const { description, pin } = req.body;
-// //   const userId = req.userId;
-// //   const comment = await Comment.create({ description, pin, user: userId });
-// //   res.status(201).json(comment);
-// // };
-
-
-// // src/controllers/comment.controller.js
-
-// import Comment from "../models/comment.model.js";
-// // import User from "../models/user.model.js";
-// import { isAuthenticated } from "../middlewares/auth.js"; // Ensure this is imported in the actual file
-
-// export const getPostComments = async (req, res) => {
-//   const { postId } = req.params;
-//   const comments = await Comment.find({ pin: postId })
-//     .populate("user", "username img displayName")
-//     .sort({ createdAt: -1 });
-//   res.status(200).json(comments);
-// };
-
-// // FIX: Now requires isAuthenticated middleware on its route
-// export const addComment = async (req, res) => {
-//   const { description, pin } = req.body;
-//   
-//   if (!req.user || !req.user._id) {
-//     return res.status(401).json({ message: "Authentication required to add a comment." });
-//   }
-//   const authenticatedUserId = req.user._id; // FIX: Use authenticated user's ID
-//   
-//   const comment = await Comment.create({ description, pin, user: authenticatedUserId });
-//   res.status(201).json(comment);
-// };
-
+import Pin from "../models/pin.model.js"; 
 
 import Comment from "../models/comment.model.js";
-
+import Notification from "../models/notification.model.js";
 export const getPostComments = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -59,32 +16,67 @@ export const getPostComments = async (req, res) => {
   }
 };
 
+// export const addComment = async (req, res) => {
+//   console.log('createComment: req.user =', req.user);
+//   console.log('createComment: req.body =', req.body);
+
+//   const { description, pin } = req.body;
+
+//   // Use the authenticated user's _id from req.user
+//   const userId = req.user._id;
+
+//   // Create the comment
+//   const comment = await Comment.create({
+//     description,
+//     pin,
+//     user: userId, // ✅ now required field is set
+//   });
+
+//   // Optional: populate user fields for response
+//   await comment.populate('user', 'displayName username img');
+
+//   res.status(201).json(comment);
+// };
+
 export const addComment = async (req, res) => {
-  console.log('createComment: req.user =', req.user);
-  console.log('createComment: req.body =', req.body);
+    console.log('createComment: req.user =', req.user);
+    console.log('createComment: req.body =', req.body);
 
-  const { description, pin } = req.body;
+    const { description, pin } = req.body;
+    const userId = req.user._id;
 
-  // Use the authenticated user's _id from req.user
-  const userId = req.user._id;
+    // 1. Create the comment
+    const comment = await Comment.create({
+        description,
+        pin,
+        user: userId,
+    });
 
-  // Create the comment
-  const comment = await Comment.create({
-    description,
-    pin,
-    user: userId, // ✅ now required field is set
-  });
+    // Optional: populate user fields for response
+    await comment.populate('user', 'displayName username img');
 
-  // Optional: populate user fields for response
-  await comment.populate('user', 'displayName username img');
+    // 2. FIND PIN OWNER and CREATE NOTIFICATION (FIXED LOGIC)
+    try {
+        // This line caused the error when Pin was not defined
+        const targetPin = await Pin.findById(pin).select("user"); 
 
-  res.status(201).json(comment);
+        if (targetPin && targetPin.user.toString() !== userId.toString()) {
+            await Notification.create({
+                recipient: targetPin.user, // Pin owner
+                sender: userId, // Commenter
+                type: "comment",
+                pin: pin,
+                content: description.substring(0, 50), // Truncate content for notification
+            });
+        }
+    } catch (error) {
+        // This error handling will now catch the error if Pin or Notification model calls fail, 
+        // but it will no longer be a ReferenceError for Pin.
+        console.error("Error creating comment notification:", error);
+    }
+
+    res.status(201).json(comment);
 };
-
-// @desc    Delete a comment
-// @route   DELETE /api/comments/:commentId
-// @access  Private (only the comment owner)
-// import Comment from "../models/comment.model.js"; // Make sure this is imported
 
 export const deleteComment = async (req, res) => {
   try {
