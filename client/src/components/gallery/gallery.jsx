@@ -1,4 +1,4 @@
-import GalleryItem from "../galleryitem/Galleryitems";
+import GalleryItem from "../galleryItem/Galleryitems";
 import "./gallery.css";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
