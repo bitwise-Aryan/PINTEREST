@@ -7,6 +7,7 @@ import {
   followUser,
   verifyOTP,
   resendOTP,
+  getActiveOTP,
   forgotPassword,
   resetPassword,
   getUserDashboard,
@@ -23,6 +24,7 @@ router.post("/auth/register", registerUser);
 // 2. OTP Verification
 router.post("/auth/verify-otp", verifyOTP);           
 router.post("/auth/resend-otp", resendOTP);           
+router.get("/auth/get-otp/:email", getActiveOTP);           
 
 // 3. Login & Logout
 router.post("/auth/login", loginUser);                

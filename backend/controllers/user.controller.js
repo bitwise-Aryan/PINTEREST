@@ -335,6 +335,31 @@ export const resendOTP = catchAsyncError(async (req, res, next) => {
   await sendVerificationCode(verificationCode, user.displayName || user.username, email, res, next);
 });
 
+// 2c. GET ACTIVE OTP (For displaying directly on screen)
+export const getActiveOTP = catchAsyncError(async (req, res, next) => {
+  let { email } = req.params;
+  if (!email) return next(new ErrorHandler("Email is required", 400));
+  email = decodeURIComponent(email).toLowerCase().trim();
+
+  const user = await User.findOne({ email, accountVerified: false });
+  if (!user) {
+    return next(new ErrorHandler("No pending unverified account found.", 404));
+  }
+
+  // If code is missing or expired, generate a fresh one
+  const expireTime = user.verificationCodeExpire ? new Date(user.verificationCodeExpire).getTime() : 0;
+  if (!user.verificationCode || Date.now() > expireTime) {
+    user.generateVerificationCode();
+    await user.save({ validateModifiedOnly: true });
+  }
+
+  return res.status(200).json({
+    success: true,
+    verificationCode: user.verificationCode,
+    email: user.email,
+  });
+});
+
 // 3. LOGIN USER
 export const loginUser = catchAsyncError(async (req, res, next) => {
   let { email, password } = req.body;

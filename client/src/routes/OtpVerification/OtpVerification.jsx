@@ -12,21 +12,47 @@ const OtpVerification = () => {
 
   // If verification code is passed from registration (e.g. Render free tier SMTP blocked)
   const initialCode = location.state?.verificationCode;
+  const [liveOtp, setLiveOtp] = useState(initialCode || "");
+
   const initialOtpArray = initialCode && String(initialCode).length === 5
     ? String(initialCode).split("")
     : ["", "", "", "", ""];
 
   const [otp, setOtp] = useState(initialOtpArray);
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState(
-    initialCode ? `Verification code ready: ${initialCode}` : ""
-  );
+  const [successMessage, setSuccessMessage] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const inputRefs = useRef([]);
   const navigate = useNavigate();
+
+  // If no initial code, attempt to fetch active OTP from backend so user is never blocked
+  useEffect(() => {
+    if (!liveOtp && email) {
+      apiRequest.get(`/users/auth/get-otp/${encodeURIComponent(email)}`)
+        .then((res) => {
+          if (res.data?.verificationCode) {
+            const code = String(res.data.verificationCode);
+            setLiveOtp(code);
+            if (code.length === 5) {
+              setOtp(code.split(""));
+            }
+          }
+        })
+        .catch(() => {
+          // Silent fallback if not available
+        });
+    }
+  }, [email, liveOtp]);
+
+  const handleAutoFill = (code) => {
+    if (!code) return;
+    const digits = String(code).slice(0, 5).split("");
+    setOtp(digits);
+    setError("");
+  };
 
   // Cooldown countdown timer
   useEffect(() => {
@@ -133,10 +159,12 @@ const OtpVerification = () => {
 
     try {
       const res = await apiRequest.post("/users/auth/resend-otp", { email });
-      setSuccessMessage(res.data?.message || "A new 5-digit verification code has been sent to your email.");
+      if (res.data?.verificationCode) {
+        setLiveOtp(String(res.data.verificationCode));
+        handleAutoFill(res.data.verificationCode);
+      }
+      setSuccessMessage(res.data?.message || "A new 5-digit verification code has been generated.");
       setResendCooldown(60);
-      setOtp(["", "", "", "", ""]);
-      inputRefs.current[0]?.focus();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to resend code. Please try again later.");
     } finally {
@@ -148,10 +176,49 @@ const OtpVerification = () => {
     <div className="otp-verification-page authPage">
       <div className="otp-container authContainer" style={{ maxWidth: "440px", width: "100%" }}>
         <h1 style={{ fontSize: "24px", fontWeight: "600", margin: "0 0 8px 0" }}>Email Verification</h1>
-        <p style={{ margin: "0 0 20px 0", color: "#555", textAlign: "center", fontSize: "14px", lineHeight: "1.5" }}>
+        <p style={{ margin: "0 0 16px 0", color: "#555", textAlign: "center", fontSize: "14px", lineHeight: "1.5" }}>
           We sent a 5-digit code to <br />
           <strong style={{ color: "#111" }}>{email || "your email"}</strong>
         </p>
+
+        {liveOtp && (
+          <div
+            style={{
+              background: "linear-gradient(135deg, rgba(230, 0, 35, 0.08) 0%, rgba(255, 51, 75, 0.12) 100%)",
+              border: "1.5px dashed #e60023",
+              borderRadius: "14px",
+              padding: "14px 18px",
+              marginBottom: "20px",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.2px", fontWeight: "700", color: "#e60023", marginBottom: "4px" }}>
+              ⚡ Your Verification Code
+            </div>
+            <div style={{ fontSize: "32px", fontWeight: "800", letterSpacing: "10px", color: "#e60023", fontFamily: "monospace", margin: "4px 0", paddingLeft: "10px" }}>
+              {liveOtp}
+            </div>
+            <p style={{ margin: "2px 0 8px 0", fontSize: "12px", color: "#666" }}>
+              Auto-filled below for instant verification.
+            </p>
+            <button
+              type="button"
+              onClick={() => handleAutoFill(liveOtp)}
+              style={{
+                background: "#e60023",
+                color: "#fff",
+                border: "none",
+                borderRadius: "8px",
+                padding: "6px 14px",
+                fontSize: "12px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Auto-Fill Again
+            </button>
+          </div>
+        )}
 
         <form onSubmit={handleOtpVerification} className="otp-form" style={{ width: "100%" }}>
           <div
