@@ -160,7 +160,7 @@ async function sendVerificationCode(
     });
   } catch (error) {
     console.error("VERIFICATION CODE SENDING ERROR:", error);
-    return next(new ErrorHandler("Failed to send verification email. Please check your email configuration or try again.", 500));
+    return next(new ErrorHandler(`Failed to send verification email: ${error.message}`, 500));
   }
 }
 

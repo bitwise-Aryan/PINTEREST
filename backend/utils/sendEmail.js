@@ -2,24 +2,46 @@
 import nodeMailer from "nodemailer";
 
 export const sendEmail = async ({ email, subject, message }) => {
-  const transporter = nodeMailer.createTransport({
-    host: process.env.SMTP_HOST,
-    service: process.env.SMTP_SERVICE,
-    port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_PORT == 465 ? true : false, // Added secure option based on port
-    auth: {
-      user: process.env.SMTP_MAIL,
-      pass: process.env.SMTP_PASSWORD,
-    },
-  });
+  const isGmail = process.env.SMTP_SERVICE?.toLowerCase() === 'gmail' || process.env.SMTP_HOST?.includes('gmail');
+  const sanitizedPassword = (process.env.SMTP_PASSWORD || '').replace(/\s+/g, '').trim();
+  const smtpUser = (process.env.SMTP_MAIL || '').trim();
 
-  const options = {
-    from: process.env.SMTP_MAIL,
-    to: email,
-    subject,
-    html: message, // Used for rich content like the HTML template
-  };
-  
-  // Use 'await' to ensure execution completes before moving on
-  await transporter.sendMail(options);
+  let transportConfig;
+
+  if (isGmail) {
+    transportConfig = {
+      service: 'gmail',
+      auth: {
+        user: smtpUser,
+        pass: sanitizedPassword,
+      },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+    };
+  } else {
+    transportConfig = {
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: Number(process.env.SMTP_PORT) === 465,
+      auth: {
+        user: smtpUser,
+        pass: sanitizedPassword,
+      },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+    };
+  }
+
+  const transporter = nodeMailer.createTransport(transportConfig);
+
+  const options = {
+    from: `"Pinterest" <${smtpUser}>`,
+    to: email,
+    subject,
+    html: message,
+  };
+
+  await transporter.sendMail(options);
 };
