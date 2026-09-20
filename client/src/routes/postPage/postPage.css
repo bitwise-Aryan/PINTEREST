@@ -1,120 +1,271 @@
+/* --- Global Page Container --- */
 .postPage {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
+    /* Ensures the post container is vertically and horizontally centered */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    height: 160vh;
+    align-items: center; /* Centers the postContainer box vertically */
+    background: linear-gradient(135deg, #f0f0f0 0%, #ffffff 100%);
 }
 
+/* --- Main Post Container with Glassmorphic Neon Effect --- */
 .postContainer {
-  width: 70%;
-  max-height: 690px;
-  display: flex;
-  border: 1px solid #e9e9e9;
-  border-radius: 32px;
-  overflow: hidden;
+    width: 90%; /* Increased width */
+    max-height: 129vh; /* Limits the overall height to fit viewport */
+    min-height: 500px;
+    display: flex;
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative; 
+
+    /* Glassmorphic & Red Neon Effect */
+    background-color: rgba(255, 255, 255, 0.1); 
+    backdrop-filter: blur(15px) saturate(180%); 
+    -webkit-backdrop-filter: blur(15px) saturate(180%); 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    
+    box-shadow: 
+        0 0 15px rgba(255, 0, 80, 0.3), 
+        0 0 30px rgba(255, 0, 80, 0.2), 
+        0 8px 30px rgba(0, 0, 0, 0.2); 
 }
 
+/* --- Image Section --- */
 .postImg {
-  /* FIXED: IMAGE */
-  /* flex: 1; */
-  
-  background-color: #d18029;
+    flex: 1 1 50%; 
+    max-width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent; 
 }
 
 .postImg img {
-  width: 100%;
-  height: 100%;
-  /* FIXED: IMAGE */
-  /* object-fit: cover; */
-  object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+    border-radius: 30px 0 0 30px; 
 }
 
+/* --- Post Details Section (Right Panel) --- */
 .postDetails {
-  flex: 1;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  padding: 16px;
-  overflow: hidden;
+    flex: 1 1 50%; 
+    min-width: 350px; 
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    height: 100%; 
+    
+    /* CRITICAL FIX: Ensure no top-level scrolling here for max reliability */
+    overflow-y: hidden; 
+    
+    background-color: rgba(255, 255, 255, 0.7); 
+    gap: 0; 
 }
 
+/* Scrollbar styling for postDetails container (will rarely be seen) */
+.postDetails::-webkit-scrollbar {
+    width: 8px; 
+}
+.postDetails::-webkit-scrollbar-thumb {
+    background-color: #ff0050; 
+    border-radius: 10px;
+}
+.postDetails::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.2); 
+}
+
+/* --- PostInteractions Component --- */
+.postInteractions {
+    flex-shrink: 0; 
+    margin-bottom: 15px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5); 
+}
+
+
+/* --- Text Content (Title & Description) --- */
+.pin-text-content {
+    margin-bottom: 20px;
+    flex-shrink: 0; 
+}
+
+.pin-detail-title {
+    font-size: 2.25rem; 
+    font-weight: 800;
+    color: #1f2937;
+    margin-top: 0;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.pin-detail-description {
+    font-size: 1rem;
+    color: #4b5563;
+    line-height: 1.5;
+    margin-bottom: 0;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee; 
+}
+
+/* --- Post User Info --- */
 .postUser {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    margin-bottom: 20px; 
+    flex-shrink: 0; 
 }
 
 .postUser img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .postUser span {
-  font-size: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
 }
 
-@media (max-width: 1127px) {
-  .postContainer {
-    width: 100%;
-    margin-right: 16px;
-  }
-}
-@media (max-width: 751px) {
-  .postContainer {
-    flex-direction: column;
-    max-height: unset;
-  }
-}
-
-
-/* Add this to postPage.css */
-
-.postDetails h1 {
-  font-size: 28px;
-  font-weight: 600;
-  margin-top: 24px;
-}
-
-.postDetails p {
-  font-size: 16px;
-  color: #333;
-  margin-top: 8px;
-  line-height: 1.5;
-}
-
+/* --- AI Tags Container --- */
 .ai-tags-container {
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #efefef;
-  width: 100%;
+    margin-top: 0; 
+    padding-top: 16px;
+    border-top: 1px solid #efefef;
+    width: 100%;
+    margin-bottom: 20px; 
+    flex-shrink: 0; 
 }
 
 .tags-title {
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #555;
-  font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #555;
+    font-size: 14px;
 }
 
+/* --- Horizontal Slider for AI Tags (Scroll-X) --- */
 .tags-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+    display: flex;
+    flex-wrap: nowrap; 
+    gap: 8px;
+    overflow-x: auto; 
+    padding-bottom: 10px; 
+    flex-shrink: 0;
+    
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
+
+.tags-list::-webkit-scrollbar {
+    display: none;
+}
+
 
 .ai-tag {
-  display: inline-block;
-  background-color: #efefef;
-  padding: 6px 14px;
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #111;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
+    display: inline-block;
+    background-color: rgba(255, 0, 80, 0.1); 
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ff0050; 
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    border: 1px solid rgba(255, 0, 80, 0.3); 
+    flex-shrink: 0; 
 }
 
 .ai-tag:hover {
-  background-color: #e0e0e0;
+    background-color: rgba(255, 0, 80, 0.2); 
+    transform: translateY(-2px); 
+}
+
+/* --- CRITICAL FIX: Space Preference and Vertical Slider for Comments --- */
+.comments-wrapper { 
+    /* CRITICAL: Takes up all remaining vertical space */
+    flex-grow: 1; 
+    
+    /* CRITICAL FIX: Dedicated vertical slider for comments */
+    overflow-y: auto; 
+    
+    /* Setting a specific height is often unnecessary, but this ensures a minimum */
+    min-height: 150px; 
+    
+    padding-top: 10px; 
+    margin-top: auto; 
+    
+    /* Scrollbar styling for comments area */
+    scrollbar-width: thin;
+    scrollbar-color: #ff0050 #f0f0f0; 
+}
+
+.comments-wrapper::-webkit-scrollbar {
+    width: 6px; 
+}
+.comments-wrapper::-webkit-scrollbar-thumb {
+    background-color: #ff0050; 
+    border-radius: 10px;
+}
+.comments-wrapper::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.1); 
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1127px) {
+    .postContainer {
+        width: 90%; 
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 751px) {
+    .postPage {
+        align-items: flex-start;
+        padding: 10px;
+        height: auto; 
+    }
+    .postContainer {
+        flex-direction: column;
+        max-height: unset; 
+        border-radius: 20px; 
+        width: 100%; 
+        min-height: unset;
+        box-shadow: 
+            0 0 10px rgba(255, 0, 80, 0.2), 
+            0 0 20px rgba(255, 0, 80, 0.1), 
+            0 4px 20px rgba(0, 0, 0, 0.1); 
+    }
+    
+    .postImg {
+        max-width: 100%; 
+        border-radius: 20px 20px 0 0; 
+    }
+
+    .postDetails {
+        overflow-y: unset; 
+        min-width: unset;
+        height: auto; 
+        padding: 15px;
+        border-radius: 0 0 20px 20px; 
+        background-color: rgba(255, 255, 255, 0.9); 
+    }
+
+    .comments-wrapper {
+        flex-grow: unset;
+        min-height: unset;
+        overflow-y: unset;
+    }
 }

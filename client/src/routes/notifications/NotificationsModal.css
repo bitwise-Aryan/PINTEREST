@@ -1,0 +1,155 @@
+/* Base Page Container: Uses the MainLayout for context */
+.notifications-page-container {
+    padding: 2rem;
+    max-width: 900px; /* Increased max-width for bigger items */
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+.page-header h1 {
+    font-size: 2.2rem; /* Slightly larger header */
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.75rem;
+}
+
+/* --------------------------------------------------- */
+/* Styles for the Notification List and Items */
+/* --------------------------------------------------- */
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; /* Increased gap */
+}
+
+/* --- Empty/Loading state message --- */
+.empty-state, .loading-state {
+    color: #9ca3af;
+    font-style: italic;
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1.2rem;
+}
+
+/* --- Notification item (INCREASED SIZE & DRAMATIC NEON EFFECT) --- */
+.notification-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem; /* Increased padding for height */
+    min-height: 70px; /* Ensure minimum size */
+    cursor: pointer;
+    border-radius: 1rem; /* Softer, larger corners */
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    column-gap: 1rem; /* Increased column gap */
+    user-select: none;
+    border: 2px solid transparent; /* Neon glow starts here */
+    background-color: #ffffff;
+    position: relative;
+}
+
+/* Hover effect with subtle neon glow */
+.notification-item:hover {
+    background-color: #fcfcfc;
+    /* Soft neon glow on hover */
+    box-shadow: 0 0 10px rgba(255, 0, 100, 0.3), 0 0 20px rgba(255, 0, 100, 0.1);
+    transform: translateY(-2px); /* Subtle lift */
+    border-color: #ff006a33; /* Light pink border */
+}
+
+/* Read vs unread - Enhanced Red Tincture with Neon Feel */
+.notification-item.unread {
+    background-color: #fff4f8; /* Lighter, more vibrant background */
+    border-color: #ff85a2; /* Distinct pink border */
+    /* Stronger neon shadow for unread */
+    box-shadow: 
+        0 0 5px #ff5c93, /* Inner glow */
+        0 0 15px rgba(255, 0, 100, 0.3); /* Outer glow */
+    animation: pulse-neon 1.5s infinite alternate; /* Subtle pulse for new items */
+}
+
+/* Further enhance unread visual */
+.notification-item.unread .sender-name {
+    color: #ff006a; /* Vibrant neon pink sender name */
+    text-shadow: 0 0 5px rgba(255, 0, 100, 0.7); /* Subtle text glow */
+}
+
+/* Optional: Unread Marker */
+.notification-item.unread::before {
+    content: '';
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem; /* Moved to the right for better visual flow */
+    width: 10px;
+    height: 10px;
+    background-color: #ff006a;
+    border-radius: 50%;
+    z-index: 10;
+    /* Strong neon glow for the marker */
+    box-shadow: 0 0 8px #ff006a;
+}
+
+/* Keyframes for subtle pulsing neon effect */
+@keyframes pulse-neon {
+    from {
+        box-shadow: 
+            0 0 5px #ff5c93,
+            0 0 15px rgba(255, 0, 100, 0.3);
+    }
+    to {
+        box-shadow: 
+            0 0 7px #ff5c93,
+            0 0 20px rgba(255, 0, 100, 0.5);
+    }
+}
+
+/* --- Sender Image (Increased size) --- */
+.sender-img {
+    width: 50px; /* Increased size */
+    height: 50px; /* Increased size */
+    border-radius: 9999px;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(255, 0, 100, 0.7); /* Neon shadow */
+    transition: transform 0.3s ease;
+}
+.notification-item:hover .sender-img {
+    transform: scale(1.05);
+}
+
+
+/* --- Notification content (Slightly larger text) --- */
+.notification-content {
+    flex: 1;
+    font-size: 1rem; /* Increased font size */
+    color: #1f2937;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    white-space: normal;
+    overflow-x: hidden;
+}
+
+/* Pin preview container (Increased size) */
+.pin-preview-container {
+    width: 60px; /* Increased size */
+    height: 60px; /* Increased size */
+    border-radius: 0.5rem; /* Softer corners */
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px rgb(220 38 38 / 0.7); /* Stronger shadow */
+}
+
+/* Pin preview image */
+.pin-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.pin-preview-container:hover .pin-preview-img {
+    transform: scale(1.1);
+}

@@ -126,7 +126,7 @@
 import "./authPage.css";
 import Image from "../../components/image/image";
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; 
+import { useNavigate, Link, Navigate } from "react-router-dom"; 
 import useAuthStore from "../../utils/authStore";
 import Login from "../../components/Login/Login";
 import Register from "../../components/Register/Register";
@@ -139,8 +139,7 @@ const AuthPage = () => {
 
   // If already authenticated, redirect to home.
   if (currentUser) {
-    navigate("/");
-    return null; 
+    return <Navigate to="/" replace />; 
   }
 
   return (

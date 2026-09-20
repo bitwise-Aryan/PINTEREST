@@ -2,102 +2,106 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiRequest from "../../utils/apiRequest";
 
-const Register = () => { // Removed setIsRegister prop, handling is in AuthPage
+const Register = () => {
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
 
-    // Basic client-side validation check for all required fields
-    if (!data.username || !data.displayName || !data.email || !data.password || !data.phone || !data.verificationMethod) {
-        setError("All fields (including phone and verification method) are required!");
-        return;
+    const username = (data.username || "").trim();
+    const displayName = (data.displayName || "").trim();
+    const email = (data.email || "").trim().toLowerCase();
+    const password = (data.password || "").trim();
+
+    if (!username || !displayName || !email || !password) {
+      setError("Please fill in all required fields.");
+      return;
     }
 
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
-      // Assuming your backend expects the phone number without the +91 prefix 
-      // or that the backend handles adding the country code if necessary.
-      // If the backend needs +91, you might prepend it here: 
-      // data.phone = `+91${data.phone}`; 
-      
-      // Endpoint matches: router.post("/auth/register", registerUser);
-      const res = await apiRequest.post("/users/auth/register", data);
+      const res = await apiRequest.post("/users/auth/register", {
+        username,
+        displayName,
+        email,
+        password,
+      });
 
-      // Extract verification details from response or form data
-      const verificationEmail = res.data.email || data.email;
-      const verificationPhone = res.data.phone || data.phone; 
-      
-      // Redirect to OTP verification page
-      navigate(`/otp-verification/${verificationEmail}/${verificationPhone}`);
-
+      const targetEmail = res.data.email || email;
+      navigate(`/otp-verification/${encodeURIComponent(targetEmail)}`);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <form key="register" onSubmit={handleSubmit} className="auth-form">
-      {/* --- Existing Fields --- */}
       <div className="formGroup">
         <label htmlFor="username">Username</label>
-        <input type="text" placeholder="Username" required name="username" id="username" />
-      </div>
-      <div className="formGroup">
-        <label htmlFor="displayName">Name</label>
-        <input type="text" placeholder="Name" required name="displayName" id="displayName" />
-      </div>
-      <div className="formGroup">
-        <label htmlFor="email">Email</label>
-        <input type="email" placeholder="Email" required name="email" id="email" />
-      </div>
-      <div className="formGroup">
-        <label htmlFor="password">Password</label>
-        <input type="password" placeholder="Password" required name="password" id="password" />
-      </div>
-
-      {/* --- NEW FIELD: Phone --- */}
-      <div className="formGroup">
-        <label htmlFor="phone">Phone</label>
-        <input 
-          type="text" // Using text to avoid browser weirdness, but enforce digits if needed
-          placeholder="Phone Number" 
-          required 
-          name="phone" 
-          id="phone" 
+        <input
+          type="text"
+          placeholder="Choose a unique username"
+          required
+          name="username"
+          id="username"
+          disabled={isLoading}
         />
       </div>
 
-      {/* --- NEW FIELD: Verification Method --- */}
-      <div className="verification-method formGroup">
-          <p>Select Verification Method</p>
-          <div className="wrapper">
-              <label>
-                  <input
-                    type="radio"
-                    name="verificationMethod"
-                    value="email"
-                    required
-                  />
-                  Email
-              </label>
-              <label>
-                  <input
-                    type="radio"
-                    name="verificationMethod"
-                    value="phone"
-                    required
-                  />
-                  Phone
-              </label>
-          </div>
+      <div className="formGroup">
+        <label htmlFor="displayName">Full Name</label>
+        <input
+          type="text"
+          placeholder="Your full name"
+          required
+          name="displayName"
+          id="displayName"
+          disabled={isLoading}
+        />
       </div>
-      
-      <button type="submit">Register</button>
-      {/* Display the error message including the custom prompt */}
+
+      <div className="formGroup">
+        <label htmlFor="email">Email</label>
+        <input
+          type="email"
+          placeholder="name@example.com"
+          required
+          name="email"
+          id="email"
+          disabled={isLoading}
+        />
+      </div>
+
+      <div className="formGroup">
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          placeholder="At least 6 characters"
+          required
+          name="password"
+          id="password"
+          disabled={isLoading}
+        />
+      </div>
+
+      <button type="submit" disabled={isLoading}>
+        {isLoading ? "Sending verification code..." : "Sign Up with Email"}
+      </button>
+
       {error && <p className="error">{error}</p>}
     </form>
   );

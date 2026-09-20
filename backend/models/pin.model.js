@@ -1,6 +1,7 @@
 import { Schema } from "mongoose";
 import mongoose from "mongoose";
 
+
 // Define the Pin schema to store pin metadata and media info.
 const pinSchema = new Schema(
   {

@@ -1,11 +1,9 @@
-import { catchAsyncError } from "../middlewares/catchAsyncError.js"; // <-- FIX: Added .js extension
-import Notification from "../models/notification.model.js"; // <-- FIX: Added .js extension
-import User from "../models/user.model.js"; // <-- FIX: Added .js extension
-import Pin from "../models/pin.model.js"; // <-- FIX: Added .js extension
+import { catchAsyncError } from "../middlewares/catchAsyncError.js"; // 
+import Notification from "../models/notification.model.js"; // <-- 
+import User from "../models/user.model.js"; // <-- 
+import Pin from "../models/pin.model.js"; // <--
 
-// @desc    Get all notifications for the authenticated user
-// @route   GET /notifications
-// @access  Private
+
 export const getNotifications = catchAsyncError(async (req, res) => {
     const userId = req.user._id;
 
@@ -16,9 +14,9 @@ export const getNotifications = catchAsyncError(async (req, res) => {
             // Use the actual imported models for the 'populate' function.
             // This ensures Mongoose doesn't fail to resolve the string reference.
             .populate({
-                path: 'sender',
+                path: 'sender',// Field in Notification schema to populate
                 model: User, // Use the imported User model
-                select: 'username displayName img'
+                select: 'username displayName img'// Select only necessary fields       
             })
             .populate({
                 path: 'pin',

@@ -1,8 +1,6 @@
 import axios from "axios";
 
-// FIX: Hardcode the backend URL to ensure API calls go to the correct port (3000)
-// If your backend is running on a different port, update this value.
-const BACKEND_URL = 'http://localhost:3000'; 
+const BACKEND_URL = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:3000'; 
 
 const apiRequest = axios.create({
   baseURL: BACKEND_URL,

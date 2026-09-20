@@ -51,6 +51,75 @@
 
 // export default PostPage;
 
+// import "./postPage.css";
+// import Image from "../../components/image/image";
+// import PostInteractions from "../../components/postInteractions/postInteractions";
+// import { Link, useParams } from "react-router-dom";
+// import Comments from "../../components/comments/comments";
+// import { useQuery } from "@tanstack/react-query";
+// import apiRequest from "../../utils/apiRequest";
+
+// const PostPage = () => {
+//   const { id } = useParams();
+
+//   const { isPending, error, data } = useQuery({
+//     queryKey: ["pin", id],
+//     queryFn: () => apiRequest.get(`/pins/${id}`).then((res) => res.data),
+//   });
+
+//   if (isPending) return "Loading...";
+
+//   if (error) return "An error has occurred: " + error.message;
+
+//   if (!data) return "Pin not found!";
+
+//   return (
+//     <div className="postPage">
+//       <svg
+//         onClick={() => window.history.back()}
+//         height="20"
+//         viewBox="0 0 24 24"
+//         width="20"
+//         style={{ cursor: "pointer" }}
+//       >
+//         <path d="M8.41 4.59a2 2 0 1 1 2.83 2.82L8.66 10H21a2 2 0 0 1 0 4H8.66l2.58 2.59a2 2 0 1 1-2.82 2.82L1 12z"></path>
+//       </svg>
+//       <div className="postContainer">
+//         <div className="postImg">
+//           <Image path={data.media} alt="" w={736} />
+//         </div>
+//         <div className="postDetails">
+//           {/* 💡 PASS THE PIN OWNER'S DATA TO THE COMPONENT */}
+//           <PostInteractions postId={id} pinOwner={data.user} />
+//           <Link to={`/profile/${data.user.username}`} className="postUser">
+//             <Image path={data.user.img || "/general/noAvatar.png"} />
+//             <span>{data.user.displayName}</span>
+//           </Link>
+
+//           {data.aiTags && data.aiTags.length > 0 && (
+//             <div className="ai-tags-container">
+//               <p className="tags-title">AI Generated Tags:</p>
+//               <div className="tags-list">
+//                 {data.aiTags.map((tag, index) => (
+//                   <Link to={`/?search=${tag}`} key={index} className="ai-tag">
+//                     {tag}
+//                   </Link>
+//                 ))}
+//               </div>
+//             </div>
+//           )}
+//           <Comments id={data._id} />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default PostPage;
+
+
+// In src/pages/postPage/PostPage.jsx
+
 import "./postPage.css";
 import Image from "../../components/image/image";
 import PostInteractions from "../../components/postInteractions/postInteractions";
@@ -60,59 +129,79 @@ import { useQuery } from "@tanstack/react-query";
 import apiRequest from "../../utils/apiRequest";
 
 const PostPage = () => {
-  const { id } = useParams();
+    const { id } = useParams();
 
-  const { isPending, error, data } = useQuery({
-    queryKey: ["pin", id],
-    queryFn: () => apiRequest.get(`/pins/${id}`).then((res) => res.data),
-  });
+    const { isPending, error, data } = useQuery({
+        queryKey: ["pin", id],
+        queryFn: () => apiRequest.get(`/pins/${id}`).then((res) => res.data),
+    });
 
-  if (isPending) return "Loading...";
+    if (isPending) return "Loading...";
 
-  if (error) return "An error has occurred: " + error.message;
+    if (error) return "An error has occurred: " + error.message;
 
-  if (!data) return "Pin not found!";
+    if (!data) return "Pin not found!";
 
-  return (
-    <div className="postPage">
-      <svg
-        onClick={() => window.history.back()}
-        height="20"
-        viewBox="0 0 24 24"
-        width="20"
-        style={{ cursor: "pointer" }}
-      >
-        <path d="M8.41 4.59a2 2 0 1 1 2.83 2.82L8.66 10H21a2 2 0 0 1 0 4H8.66l2.58 2.59a2 2 0 1 1-2.82 2.82L1 12z"></path>
-      </svg>
-      <div className="postContainer">
-        <div className="postImg">
-          <Image path={data.media} alt="" w={736} />
-        </div>
-        <div className="postDetails">
-          {/* 💡 PASS THE PIN OWNER'S DATA TO THE COMPONENT */}
-          <PostInteractions postId={id} pinOwner={data.user} />
-          <Link to={`/profile/${data.user.username}`} className="postUser">
-            <Image path={data.user.img || "/general/noAvatar.png"} />
-            <span>{data.user.displayName}</span>
-          </Link>
+    return (
+        <div className="postPage">
+            <svg
+                onClick={() => window.history.back()}
+                height="20"
+                viewBox="0 0 24 24"
+                width="20"
+                style={{ cursor: "pointer" }}
+            >
+                <path d="M8.41 4.59a2 2 0 1 1 2.83 2.82L8.66 10H21a2 2 0 0 1 0 4H8.66l2.58 2.59a2 2 0 1 1-2.82 2.82L1 12z"></path>
+            </svg>
+            <div className="postContainer">
+                <div className="postImg">
+                    {/* Added alt tag for accessibility */}
+                    <Image path={data.media} alt={data.title} w={736} /> 
+                </div>
+                <div className="postDetails">
+                    
+                    <PostInteractions postId={id} pinOwner={data.user} imageUrl={data.imageUrl} /> 
 
-          {data.aiTags && data.aiTags.length > 0 && (
-            <div className="ai-tags-container">
-              <p className="tags-title">AI Generated Tags:</p>
-              <div className="tags-list">
-                {data.aiTags.map((tag, index) => (
-                  <Link to={`/?search=${tag}`} key={index} className="ai-tag">
-                    {tag}
-                  </Link>
-                ))}
-              </div>
+                    {/* -------------------- START: TITLE AND DESCRIPTION ADDITION -------------------- */}
+                    <div className="pin-text-content">
+                        {/* 1. Display the Title */}
+                        {data.title && (
+                            <h1 className="pin-detail-title">
+                                {data.title}
+                            </h1>
+                        )}
+
+                        {/* 2. Display the Description */}
+                        {data.description && (
+                            <p className="pin-detail-description">
+                                {data.description}
+                            </p>
+                        )}
+                    </div>
+                    {/* -------------------- END: TITLE AND DESCRIPTION ADDITION -------------------- */}
+
+                    <Link to={`/profile/${data.user.username}`} className="postUser">
+                        <Image path={data.user.img || "/general/noAvatar.png"} />
+                        <span>{data.user.displayName}</span>
+                    </Link>
+
+                    {data.aiTags && data.aiTags.length > 0 && (
+                        <div className="ai-tags-container">
+                            <p className="tags-title">AI Generated Tags:</p>
+                            <div className="tags-list">
+                                {data.aiTags.map((tag, index) => (
+                                    <Link to={`/?search=${tag}`} key={index} className="ai-tag">
+                                        {tag}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    <Comments id={data._id} />
+                </div>
             </div>
-          )}
-          <Comments id={data._id} />
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default PostPage;

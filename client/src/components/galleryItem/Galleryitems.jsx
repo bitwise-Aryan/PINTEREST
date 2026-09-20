@@ -77,11 +77,11 @@ const GalleryItem = ({ item }) => {
       {/* --- Overlay link to pin detail page --- */}
       <Link to={`/pin/${item._id}`} className="overlay" />
 
-      {/* --- Interaction buttons --- */}
+      {/* --- Interaction buttons ---
       <div className="overlayIcons">
         <button onClick={handleLike} disabled={likeMutation.isLoading}>
           <Image
-            path="/general/heart.svg"
+            // path="/general/heart.svg"
             alt="Like"
             className={likeMutation.isLoading ? "disabled" : ""}
           />
@@ -90,7 +90,7 @@ const GalleryItem = ({ item }) => {
         <button>
           <Image path="/general/more.svg" alt="More" />
         </button>
-      </div>
+      </div> */}
 
       {/* --- Like / Save / Share / Delete section --- */}
    <PostInteractions

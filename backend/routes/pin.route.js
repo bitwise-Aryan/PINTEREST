@@ -32,13 +32,14 @@ import {
   getTrendingPins,
   getRelatedTags,
   getSimilarPins,
-  searchByImage
+  searchByImage,
+  generateContent,
 } from "../controllers/pin.controller.js";
 // FIX: Replace the old verifyToken with the new isAuthenticated middleware
 import { isAuthenticated } from "../middlewares/auth.js"; 
 
 const router = express.Router();
-
+router.post('/generate-description', isAuthenticated, generateContent); 
 router.get("/tags/popular", getPopularTags);
 router.get("/trending", getTrendingPins);
 router.get("/related-tags", isAuthenticated, getRelatedTags);

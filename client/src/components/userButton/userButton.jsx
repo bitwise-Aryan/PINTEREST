@@ -140,7 +140,7 @@ const UserButton = () => {
             >
             Profile
           </Link>
-          <div className="userOption">Setting</div>
+{/*           <div className="userOption">Setting</div> */}
           <div className="userOption" onClick={handleLogout}>
             Logout
           </div>
