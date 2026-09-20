@@ -6,7 +6,7 @@ import Image from '../../components/image/image';
 import Skeleton from '../../components/skeleton/skeleton';
 import useAuthStore from '../../utils/authStore';
 import VisualSearch from '../../components/visualSearch/VisualSearch';
-import './ExplorePage.css';
+import './explorePage.css';
 
 const ExplorePage = () => {
     const { currentUser } = useAuthStore();
