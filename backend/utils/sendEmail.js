@@ -2,7 +2,34 @@
 import nodeMailer from "nodemailer";
 
 export const sendEmail = async ({ email, subject, message }) => {
-  // 1. If RESEND_API_KEY is provided, use Resend HTTPS REST API (Port 443 - NEVER blocked on Render Free Tier)
+  // 1. BREVO HTTP REST API (Port 443 HTTPS - Free 300 emails/day to ANY recipient, no domain required)
+  if (process.env.BREVO_API_KEY) {
+    const brevoSender = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_MAIL || 'teckstackpixel@gmail.com';
+    const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': process.env.BREVO_API_KEY.trim(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: { name: 'PIXEL • Team Techstack', email: brevoSender },
+        to: [{ email: email }],
+        subject,
+        htmlContent: message,
+      }),
+    });
+
+    if (brevoRes.ok) {
+      console.log(`✅ Email successfully sent via Brevo HTTP API to ${email}`);
+      return;
+    } else {
+      const errText = await brevoRes.text();
+      console.error('❌ Brevo API Error:', errText);
+      throw new Error(`Brevo delivery failed: ${errText}`);
+    }
+  }
+
+  // 2. RESEND HTTPS REST API (Port 443 HTTPS)
   if (process.env.RESEND_API_KEY) {
     const resendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -18,12 +45,13 @@ export const sendEmail = async ({ email, subject, message }) => {
       }),
     });
 
-    if (!resendRes.ok) {
-      const errText = await resendRes.text();
-      console.warn('Resend API failed, falling back to SMTP:', errText);
-    } else {
-      console.log(`Email successfully sent via Resend API to ${email}`);
+    if (resendRes.ok) {
+      console.log(`✅ Email successfully sent via Resend API to ${email}`);
       return;
+    } else {
+      const errText = await resendRes.text();
+      console.error('❌ Resend API Error:', errText);
+      throw new Error(`Resend delivery failed: ${errText}`);
     }
   }
 
