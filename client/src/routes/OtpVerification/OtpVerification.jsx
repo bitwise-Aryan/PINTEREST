@@ -1,17 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Navigate, useParams, useNavigate, Link } from "react-router-dom";
+import { Navigate, useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import apiRequest from "../../utils/apiRequest";
 import useAuthStore from "../../utils/authStore";
 
 const OtpVerification = () => {
   const { setCurrentUser, currentUser } = useAuthStore();
   const params = useParams();
+  const location = useLocation();
   const rawEmail = params.email || "";
   const email = decodeURIComponent(rawEmail).toLowerCase().trim();
 
-  const [otp, setOtp] = useState(["", "", "", "", ""]);
+  // If verification code is passed from registration (e.g. Render free tier SMTP blocked)
+  const initialCode = location.state?.verificationCode;
+  const initialOtpArray = initialCode && String(initialCode).length === 5
+    ? String(initialCode).split("")
+    : ["", "", "", "", ""];
+
+  const [otp, setOtp] = useState(initialOtpArray);
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState(
+    initialCode ? `Verification code ready: ${initialCode}` : ""
+  );
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -28,12 +37,13 @@ const OtpVerification = () => {
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
-  // Focus first input on mount
+  // Focus first input on mount if not pre-filled
   useEffect(() => {
+    if (initialCode) return;
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus();
     }
-  }, []);
+  }, [initialCode]);
 
   if (currentUser) {
     return <Navigate to={"/"} replace />;

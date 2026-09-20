@@ -40,7 +40,9 @@ const Register = () => {
       });
 
       const targetEmail = res.data.email || email;
-      navigate(`/otp-verification/${encodeURIComponent(targetEmail)}`);
+      navigate(`/otp-verification/${encodeURIComponent(targetEmail)}`, {
+        state: { verificationCode: res.data.verificationCode }
+      });
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Please try again.");
     } finally {
