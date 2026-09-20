@@ -2,13 +2,14 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log(" MongoDB is connected!");
+    const mongoUri = process.env.MONGO || process.env.MONGO_URI;
+    if (!mongoUri) {
+      throw new Error("Neither MONGO nor MONGO_URI environment variable is defined!");
+    }
+    await mongoose.connect(mongoUri);
+    console.log("MongoDB connected successfully!");
   } catch (err) {
-    console.error(" MONGODB CONNECTION ERROR:", err.message);
+    console.error("MONGODB CONNECTION ERROR:", err.message);
     process.exit(1); 
   }
 };
