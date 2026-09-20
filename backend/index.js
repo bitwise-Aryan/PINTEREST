@@ -6,6 +6,11 @@ import { Server as SocketServer } from "socket.io";
 import express from "express";
 import cors from "cors";
 import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import userRouter from "./routes/user.route.js"; 
 import pinRouter from "./routes/pin.route.js";
@@ -74,14 +79,19 @@ app.use("/notifications", notificationRouter);
 // Serve uploads folder statically
 app.use('/uploads', express.static('uploads'));
 
-// Serve React build static files (adjust path if needed)
-app.use(express.static(path.join(process.cwd(), 'build')));
-
-// SPA fallback: serve index.html on all unmatched routes for React Router
-app.get(/^\/(?!api).*/, (req, res) => {
-  // This will match everything except routes that start with /api (adjust pattern as needed)
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// Health check / root endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({ status: "ok", message: "Pinterest API & Socket.IO server is running!" });
 });
+
+// Serve React build static files if folder exists
+const clientBuildPath = path.join(__dirname, 'build');
+if (fs.existsSync(clientBuildPath)) {
+  app.use(express.static(clientBuildPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
 
 // Error handling middleware (should be last)
 app.use(errorMiddleware);
