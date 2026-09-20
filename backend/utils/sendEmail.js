@@ -2,42 +2,35 @@
 import nodeMailer from "nodemailer";
 
 export const sendEmail = async ({ email, subject, message }) => {
-  const isGmail = process.env.SMTP_SERVICE?.toLowerCase() === 'gmail' || process.env.SMTP_HOST?.includes('gmail');
   const sanitizedPassword = (process.env.SMTP_PASSWORD || '').replace(/\s+/g, '').trim();
   const smtpUser = (process.env.SMTP_MAIL || '').trim();
+  const smtpHost = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+  const rawPort = Number(process.env.SMTP_PORT) || 587;
+  // Port 465 is blocked on cloud hosting like Render/AWS. Force Port 587 with STARTTLS.
+  const port = rawPort === 465 ? 587 : rawPort;
 
-  let transportConfig;
+  const transporter = nodeMailer.createTransport({
+    host: smtpHost,
+    port: port,
+    secure: false, // Port 587 uses STARTTLS
+    requireTLS: true,
+    auth: {
+      user: smtpUser,
+      pass: sanitizedPassword,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeout: 12000,
+    greetingTimeout: 12000,
+    socketTimeout: 15000,
+  });
 
-  if (isGmail) {
-    transportConfig = {
-      service: 'gmail',
-      auth: {
-        user: smtpUser,
-        pass: sanitizedPassword,
-      },
-      connectionTimeout: 15000,
-      greetingTimeout: 15000,
-      socketTimeout: 20000,
-    };
-  } else {
-    transportConfig = {
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: Number(process.env.SMTP_PORT) === 465,
-      auth: {
-        user: smtpUser,
-        pass: sanitizedPassword,
-      },
-      connectionTimeout: 15000,
-      greetingTimeout: 15000,
-      socketTimeout: 20000,
-    };
-  }
-
-  const transporter = nodeMailer.createTransport(transportConfig);
+  const senderEmail = smtpUser || 'teckstackpixel@gmail.com';
 
   const options = {
-    from: `"Pinterest" <${smtpUser}>`,
+    from: `"PIXEL • Team Techstack" <${senderEmail}>`,
+    replyTo: 'teckstackpixel@gmail.com',
     to: email,
     subject,
     html: message,

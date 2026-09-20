@@ -70,7 +70,7 @@ if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
   }
 }
 
-// Utility function to generate appealing HTML email content for the verification code
+// Utility function to generate appealing, professional HTML email for PIXEL OTP verification
 function generateEmailTemplate(verificationCode, name = "there") {
     return `
     <!DOCTYPE html>
@@ -78,53 +78,63 @@ function generateEmailTemplate(verificationCode, name = "there") {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Verification Code</title>
+        <title>PIXEL - Verification Code</title>
         <style>
             body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
             table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         </style>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+    <body style="margin: 0; padding: 0; background-color: #0f1117; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; padding: 40px 10px;">
             <tr>
-                <td align="center" style="padding: 24px 0;">
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 440px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); overflow: hidden;">
+                <td align="center">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 480px; background-color: #1a1d26; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4); overflow: hidden;">
                         
+                        <!-- Header -->
                         <tr>
-                            <td align="center" style="background: linear-gradient(135deg, #e60023 0%, #ad081b 100%); padding: 28px 20px;">
-                                <h1 style="margin: 0; font-size: 24px; color: #ffffff; font-weight: bold; letter-spacing: -0.5px;">Account Verification</h1>
-                                <p style="margin: 6px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Confirm your email address</p>
+                            <td align="center" style="background: linear-gradient(135deg, #e60023 0%, #b8001b 100%); padding: 32px 24px;">
+                                <h1 style="margin: 0; font-size: 32px; color: #ffffff; font-weight: 800; letter-spacing: 2px;">PIXEL</h1>
+                                <p style="margin: 6px 0 0 0; color: rgba(255, 255, 255, 0.88); font-size: 13px; font-weight: 500; letter-spacing: 0.5px;">CREATED BY TEAM TECHSTACK</p>
                             </td>
                         </tr>
 
+                        <!-- Body Content -->
                         <tr>
-                            <td style="padding: 32px 36px; color: #333333; font-size: 15px; line-height: 1.6; text-align: center;">
-                                <p style="margin-top: 0; margin-bottom: 12px; font-weight: 600; font-size: 16px;">Hello ${name},</p>
-                                <p style="margin-top: 0; margin-bottom: 24px; color: #555555;">Use the 5-digit verification code below to complete your registration or verification. Do not share this code with anyone.</p>
+                            <td style="padding: 36px 32px; color: #e2e8f0; font-size: 15px; line-height: 1.6; text-align: center;">
+                                <h2 style="margin-top: 0; margin-bottom: 8px; color: #ffffff; font-size: 20px; font-weight: 700;">Account Verification</h2>
+                                <p style="margin-top: 0; margin-bottom: 24px; color: #94a3b8; font-size: 14px;">Hello <strong style="color: #ffffff;">${name}</strong>, use the 5-digit verification code below to complete your registration on PIXEL.</p>
                                 
+                                <!-- OTP Box -->
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                     <tr>
-                                        <td align="center" style="padding: 16px 20px; background-color: #fff0f2; border-radius: 8px; border: 2px dashed #e60023;">
-                                            <span style="font-size: 34px; color: #e60023; font-weight: bold; letter-spacing: 8px; font-family: monospace;">
+                                        <td align="center" style="padding: 20px; background: rgba(230, 0, 35, 0.08); border-radius: 12px; border: 2px dashed #e60023;">
+                                            <span style="font-size: 38px; color: #ff334b; font-weight: 800; letter-spacing: 12px; font-family: 'Courier New', Courier, monospace; display: inline-block; padding-left: 12px;">
                                                 ${verificationCode}
                                             </span>
                                         </td>
                                     </tr>
                                 </table>
 
-                                <p style="margin-top: 24px; margin-bottom: 6px; font-size: 13px; color: #dc3545; font-weight: 600;">
-                                    ⏰ This code will expire in 10 minutes.
-                                </p>
-                                <p style="margin-top: 4px; margin-bottom: 0; font-size: 12px; color: #888888;">
-                                    If you did not request this code, please ignore this email.
+                                <!-- Expiry & Security Notice -->
+                                <div style="margin-top: 24px; padding: 12px 16px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                    <p style="margin: 0; font-size: 13px; color: #cbd5e1;">
+                                        ⏳ <strong>Valid for 10 minutes.</strong> Never share this code with anyone.
+                                    </p>
+                                </div>
+                                <p style="margin-top: 16px; margin-bottom: 0; font-size: 12px; color: #64748b;">
+                                    If you did not attempt to sign up for PIXEL, please disregard this email.
                                 </p>
                             </td>
                         </tr>
                         
+                        <!-- Footer -->
                         <tr>
-                            <td align="center" style="padding: 16px 36px; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee; background-color: #fafafa;">
-                                <p style="margin: 0;">
-                                    &copy; ${new Date().getFullYear()} Pinterest Clone. All rights reserved.
+                            <td align="center" style="padding: 24px 32px; font-size: 12px; color: #64748b; border-top: 1px solid rgba(255,255,255,0.06); background-color: #141720;">
+                                <p style="margin: 0 0 8px 0; color: #94a3b8;">
+                                    Need assistance? Contact us at: <a href="mailto:teckstackpixel@gmail.com" style="color: #ff334b; text-decoration: none; font-weight: 600;">teckstackpixel@gmail.com</a>
+                                </p>
+                                <p style="margin: 0; font-size: 11px;">
+                                    &copy; ${new Date().getFullYear()} PIXEL. Created with ❤️ by Team Techstack. All rights reserved.
                                 </p>
                             </td>
                         </tr>
@@ -586,67 +596,66 @@ const htmlMessage = `
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Password Reset Request</title>
+        <title>PIXEL - Password Reset Request</title>
         <style>
-            /* Global reset and styling */
             body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
             table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-            img { -ms-interpolation-mode: bicubic; }
-            a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
         </style>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
-        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+    <body style="margin: 0; padding: 0; background-color: #0f1117; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; padding: 40px 10px;">
             <tr>
-                <td align="center" style="padding: 20px 0;">
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                <td align="center">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; background-color: #1a1d26; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4); overflow: hidden;">
                         
+                        <!-- Header -->
                         <tr>
-                            <td align="center" style="background-color: #3f72af; padding: 30px 20px; border-top-left-radius: 8px; border-top-right-radius: 8px;">
-                                <h1 style="margin: 0; font-size: 28px; color: #ffffff; font-weight: bold;">Password Reset</h1>
+                            <td align="center" style="background: linear-gradient(135deg, #e60023 0%, #b8001b 100%); padding: 32px 24px;">
+                                <h1 style="margin: 0; font-size: 32px; color: #ffffff; font-weight: 800; letter-spacing: 2px;">PIXEL</h1>
+                                <p style="margin: 6px 0 0 0; color: rgba(255, 255, 255, 0.88); font-size: 13px; font-weight: 500; letter-spacing: 0.5px;">CREATED BY TEAM TECHSTACK</p>
                             </td>
                         </tr>
 
+                        <!-- Body Content -->
                         <tr>
-                            <td style="padding: 30px 40px; color: #333333; font-size: 16px; line-height: 1.6;">
-                                <h2 style="margin-top: 0; margin-bottom: 20px; font-size: 22px; color: #1f2937;">Hello ${user.displayName || user.username},</h2>
-
-                                <p style="margin-bottom: 20px;">We're processing your request to reset the password for your account. To proceed, please click the secure button below. This action ensures the security of your account.</p>
+                            <td style="padding: 36px 32px; color: #e2e8f0; font-size: 15px; line-height: 1.6;">
+                                <h2 style="margin-top: 0; margin-bottom: 12px; color: #ffffff; font-size: 20px; font-weight: 700;">Password Reset Request</h2>
+                                <p style="margin-top: 0; margin-bottom: 20px; color: #94a3b8; font-size: 14px;">
+                                    Hello <strong style="color: #ffffff;">${user.displayName || user.username}</strong>, we received a request to reset the password for your PIXEL account.
+                                </p>
                                 
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                     <tr>
-                                        <td align="center" style="padding: 20px 0;">
-                                            <table border="0" cellpadding="0" cellspacing="0">
-                                                <tr>
-                                                    <td align="center" style="border-radius: 5px; background-color: #3f72af;">
-                                                        <a href="${resetPasswordUrl}" target="_blank" style="font-size: 16px; font-weight: bold; text-decoration: none; color: #ffffff; padding: 12px 25px; border-radius: 5px; display: inline-block;">
-                                                            Reset Your Password
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </table>
+                                        <td align="center" style="padding: 16px 0 24px 0;">
+                                            <a href="${resetPasswordUrl}" target="_blank" style="background: linear-gradient(135deg, #e60023 0%, #ad081b 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 15px; font-weight: 700; border-radius: 9999px; display: inline-block; box-shadow: 0 4px 16px rgba(230, 0, 35, 0.4);">
+                                                Reset Your Password
+                                            </a>
                                         </td>
                                     </tr>
                                 </table>
                                 
-                                <p style="margin-top: 10px;">If the button above doesn't work, you can copy and paste the following link into your browser:</p>
-                                <p style="word-break: break-all; font-size: 14px; color: #3f72af; font-weight: bold; background-color: #e6f0ff; padding: 8px; border-radius: 4px;">${resetPasswordUrl}</p>
+                                <p style="margin-top: 10px; font-size: 13px; color: #94a3b8;">If the button above does not work, copy and paste this link into your browser:</p>
+                                <p style="word-break: break-all; font-size: 12px; color: #ff334b; background: rgba(230, 0, 35, 0.08); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(230, 0, 35, 0.2);">${resetPasswordUrl}</p>
                                 
-                                <div style="background-color: #fff8e1; padding: 15px; border-left: 5px solid #ffc107; margin: 30px 0; border-radius: 4px;">
-                                    <strong style="color: #6a0000;">⚠️ Important Security Notice:</strong>
-                                    <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0; font-size: 14px; color: #555;">
-                                        <li>This password reset link will expire in **10 minutes** for your security.</li>
-                                        <li>If you did not initiate this request, please **ignore this email**. Your current password will remain unchanged.</li>
-                                        <li>For security, no further action is required unless you intentionally clicked the reset link.</li>
+                                <div style="background: rgba(255, 255, 255, 0.03); padding: 16px; border-left: 4px solid #f59e0b; margin: 24px 0 0 0; border-radius: 8px;">
+                                    <strong style="color: #fbbf24; font-size: 13px;">⚠️ Security Notice:</strong>
+                                    <ul style="padding-left: 18px; margin: 6px 0 0 0; font-size: 12px; color: #cbd5e1; line-height: 1.6;">
+                                        <li>This link will expire in <strong>10 minutes</strong>.</li>
+                                        <li>If you did not request this, you can safely ignore this email. Your password will remain unchanged.</li>
                                     </ul>
                                 </div>
                             </td>
                         </tr>
                         
+                        <!-- Footer -->
                         <tr>
-                            <td align="center" style="padding: 20px 40px; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee;">
-                                <p style="margin-top: 0; margin-bottom: 5px;">This email was sent by the **TechStack Team** as an automated notification. Please do not reply directly to this message.</p>
-                                <p style="margin-bottom: 0;">&copy; ${new Date().getFullYear()} Team TechStack. All rights reserved.</p>
+                            <td align="center" style="padding: 24px 32px; font-size: 12px; color: #64748b; border-top: 1px solid rgba(255,255,255,0.06); background-color: #141720;">
+                                <p style="margin: 0 0 8px 0; color: #94a3b8;">
+                                    Need help? Reach us at: <a href="mailto:teckstackpixel@gmail.com" style="color: #ff334b; text-decoration: none; font-weight: 600;">teckstackpixel@gmail.com</a>
+                                </p>
+                                <p style="margin: 0; font-size: 11px;">
+                                    &copy; ${new Date().getFullYear()} PIXEL. Created with ❤️ by Team Techstack. All rights reserved.
+                                </p>
                             </td>
                         </tr>
                     </table>
